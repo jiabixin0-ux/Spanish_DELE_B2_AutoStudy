@@ -230,6 +230,7 @@ def add_example_label(document: Document, label: str) -> None:
 
 
 def add_example_text(document: Document, text: str, chinese: bool = False) -> None:
+    text = text.removeprefix("> ").strip()
     paragraph = document.add_paragraph(style="Chinese Translation" if chinese else "Spanish Example")
     paragraph.paragraph_format.left_indent = Inches(0.28)
     paragraph.paragraph_format.space_after = Pt(8 if chinese else 4)
@@ -277,7 +278,7 @@ def markdown_to_docx(markdown: str, output_path: Path) -> None:
             continue
         numbered_match = re.match(r"^(\d+)\.\s+(.*)$", line)
         if numbered_match:
-            add_list_paragraph(document, numbered_match.group(2), numbered=True)
+            add_text_paragraph(document, f"{numbered_match.group(1)}. {numbered_match.group(2)}", style="Instruction")
             continue
         if line.startswith("> "):
             add_example_text(document, line[2:], chinese=False)
