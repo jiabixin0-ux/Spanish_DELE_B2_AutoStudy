@@ -367,7 +367,7 @@ def build_vocab_entries(topic: dict[str, Any], source_terms: list[str]) -> list[
         term for term in source_terms
         if term in VOCAB_MEANINGS and term not in topic_terms
     ]
-    selected = list(dict.fromkeys(topic_terms + clean_source_terms))[:15]
+    selected = list(dict.fromkeys(topic_terms + clean_source_terms))[:6]
     entries = []
     for term in selected:
         example, translation = vocab_example(term, topic)
@@ -375,17 +375,42 @@ def build_vocab_entries(topic: dict[str, Any], source_terms: list[str]) -> list[
             {
                 "term": term,
                 "meaning": VOCAB_MEANINGS.get(term, "与今日主题相关的常用表达"),
-                "usage": f"DELE B2 中常用于围绕“{topic['title']}”表达观点、条件、原因或补充说明。",
+                "usage": vocab_usage(term, topic),
                 "example": example,
                 "translation": translation,
                 "related": RELATED_EXPRESSIONS.get(term, "可结合今日句型替换使用"),
+                "note": vocab_note(term),
             }
         )
     return entries
 
 
+def vocab_note(term: str) -> str:
+    if "que" in term:
+        return "注意 que 后面的动词形式；表达怀疑、建议、评价时常会触发虚拟式。"
+    if "de" in term:
+        return "注意固定介词不要省略，也不要按中文语序随意移动。"
+    if term in {"no obstante", "sin embargo", "en cambio", "por consiguiente"}:
+        return "连接词要放在真正有逻辑关系的句子之间，不要为了显得高级而堆砌。"
+    return "先用短句掌握这个表达，再放进较长段落里。"
+
+
+def vocab_usage(term: str, topic: dict[str, Any]) -> str:
+    if term.startswith(("es ", "no ", "dudo", "temo", "conviene", "resulta", "me ")):
+        return "用来表达评价、怀疑、建议或情绪；后面常接 que 从句，是 B1 到 B2 过渡的高频结构。"
+    if term in {"aunque", "no obstante", "sin embargo", "a pesar de ello", "en cambio"}:
+        return "用来承认另一面或转折观点，适合让回答不显得绝对。"
+    if term in {"por consiguiente", "por lo tanto", "en definitiva", "en resumen"}:
+        return "用来总结或推出结论，适合放在段落后半部分。"
+    if term in {"matizar", "plantear", "sostener", "poner en duda"}:
+        return "用来让观点更细致：提出、坚持、补充或质疑一个看法。"
+    if term in {"a grandes rasgos", "desde mi punto de vista", "por una parte", "por otra parte"}:
+        return "用来组织观点开头，让听者或读者先看到你的表达框架。"
+    return f"适合围绕“{topic['title']}”补充观点、例子或限制条件。"
+
+
 def build_sentence_patterns(topic: dict[str, Any]) -> list[dict[str, str]]:
-    rows = PATTERN_LIBRARY.get(topic["title"], DEFAULT_PATTERNS)[:5]
+    rows = PATTERN_LIBRARY.get(topic["title"], DEFAULT_PATTERNS)[:3]
     return [
         {
             "structure": row[0],
@@ -400,7 +425,7 @@ def build_sentence_patterns(topic: dict[str, Any]) -> list[dict[str, str]]:
 
 
 def build_grammar_points(topic: dict[str, Any]) -> list[dict[str, Any]]:
-    return GRAMMAR_LIBRARY[grammar_key(topic)][:2]
+    return GRAMMAR_LIBRARY[grammar_key(topic)][:1]
 
 
 def build_reading(topic: dict[str, Any], source_pages: str) -> dict[str, Any]:
@@ -448,12 +473,14 @@ def format_vocab(entries: list[dict[str, str]]) -> str:
     for index, entry in enumerate(entries, start=1):
         lines.extend(
             [
-                f"{index}. **{entry['term']}**",
-                f"- 中文意思：{entry['meaning']}",
-                f"- DELE B2 常见用法：{entry['usage']}",
-                f"- 西语例句：{entry['example']}",
-                f"- 中文翻译：{entry['translation']}",
-                f"- 同义替换或相关表达：{entry['related']}",
+                f"### 词汇 {index}：{entry['term']}",
+                f"【意思】{entry['meaning']}",
+                f"【使用场景】{entry['usage']}",
+                "西语：",
+                entry["example"],
+                "中文：",
+                entry["translation"],
+                f"【注意】{entry['note']}",
             ]
         )
     return "\n".join(lines)
@@ -464,12 +491,15 @@ def format_patterns(patterns: list[dict[str, str]]) -> str:
     for index, pattern in enumerate(patterns, start=1):
         lines.extend(
             [
-                f"{index}. **{pattern['structure']}**",
-                f"- 中文解释：{pattern['explanation']}",
-                f"- 使用场景：{pattern['scene']}",
-                f"- 西语例句：{pattern['example']}",
-                f"- 中文翻译：{pattern['translation']}",
-                f"- 更适合：{pattern['mode']}",
+                f"### 句型 {index}：{pattern['structure']}",
+                f"【结构】{pattern['structure']}",
+                f"【中文解释】{pattern['explanation']}",
+                f"【适用场景】{pattern['scene']}",
+                "西语：",
+                pattern["example"],
+                "中文：",
+                pattern["translation"],
+                f"【仿写提示】先保留结构，只替换主题、动词和例子。{pattern['mode']}。",
             ]
         )
     return "\n".join(lines)
@@ -478,11 +508,14 @@ def format_patterns(patterns: list[dict[str, str]]) -> str:
 def format_grammar(points: list[dict[str, Any]]) -> str:
     lines = []
     for index, point in enumerate(points, start=1):
-        lines.extend([f"{index}. **{point['title']}**", f"- 规则讲解：{point['rule']}"])
-        for example, translation in point["examples"]:
-            lines.append(f"- 例句：{example}")
-            lines.append(f"- 翻译：{translation}")
-        lines.append(f"- 中国学生常错点：{point['mistake']}")
+        lines.extend([f"### 语法点 {index}：{point['title']}", f"【核心规则】{point['rule']}"])
+        for example_index, (example, translation) in enumerate(point["examples"][:3], start=1):
+            lines.append(f"【例句 {example_index}】")
+            lines.append("西语：")
+            lines.append(example)
+            lines.append("中文：")
+            lines.append(translation)
+        lines.append(f"【中国学生常错点】{point['mistake']}")
     return "\n".join(lines)
 
 
@@ -499,124 +532,118 @@ def format_reading(reading: dict[str, Any]) -> str:
 重点表达：
 {expressions}
 
-为什么适合 B2 学习：
-{reading['b2_reason']}"""
+【阅读理解问题】这段话认为，一个 B2 回答为什么不能只停留在简单观点？
+
+【仿写任务】仿照这段结构，用 3-4 句写一个关于你学习西语方法的小段落。"""
 
 
 def build_controlled_practice(vocab_entries: list[dict[str, str]], patterns: list[dict[str, str]]) -> str:
-    terms = [entry["term"] for entry in vocab_entries]
-    return f"""**填空题（3 题）**
-1. Es importante que el estudiante ______ los errores antes de entregar el texto. (revisar)
-2. No creo que memorizar listas ______ suficiente para hablar mejor. (ser)
-3. ______ el estudiante entienda la idea principal con este ejemplo.（填入今天的一个概率表达）
+    return f"""### 第一层：控制练习
 
-**句型替换（2 题）**
-1. 把 “Es bueno practicar cada día.” 改成 “Es + adjetivo + que + subjuntivo” 结构。
-2. 用 “{patterns[0]['structure']}” 改写：El tema es difícil, pero se puede explicar con ejemplos.
+【填空 1】Es importante que el estudiante ______ los errores antes de entregar el texto. (revisar)
 
-**中译西（2 题）**
-1. 我怀疑只读规则是否足够。
-2. 最好先用短句练习，然后再写长段落。
+【填空 2】No creo que memorizar listas ______ suficiente para hablar mejor. (ser)
 
-**改错题（1-2 题）**
-1. Es importante que revisas los conectores.
-2. No creo que es una buena idea escribir demasiado el primer día."""
+【句型替换 1】把 “Es bueno practicar cada día.” 改成 “Es + adjetivo + que + subjuntivo” 结构。
+
+【句型替换 2】用 “{patterns[0]['structure']}” 改写：El tema es difícil, pero se puede explicar con ejemplos."""
 
 
 def build_half_open_output(vocab_entries: list[dict[str, str]], patterns: list[dict[str, str]]) -> str:
-    chosen_terms = "、".join(entry["term"] for entry in vocab_entries[:3])
-    chosen_patterns = "；".join(pattern["structure"] for pattern in patterns[:2])
-    return f"""1. 用今天的 3 个词组造句：{chosen_terms}。
-提示：每句 12-18 个词即可，不需要写成长段。
+    chosen_terms = "、".join(entry["term"] for entry in vocab_entries[:2])
+    return f"""### 第二层：半开放练习
 
-2. 用今天的 2 个句型仿写句子：{chosen_patterns}。
-提示：先照着例句换主题，再逐步换动词。
+【造句 1】用今天的词组造句：{vocab_entries[0]['term']}。
+提示：12-18 个词即可，先保证语法稳定。
 
-3. 根据精读段落回答 2 个简单问题：
-- ¿Por qué no basta con memorizar una regla?
-- ¿Qué ayuda a que una respuesta sea más clara y organizada?"""
+【造句 2】用今天的词组造句：{vocab_entries[1]['term']}。
+提示：可以模仿词汇表里的例句。
+
+【段落回答】根据精读段落回答：¿Qué ayuda a que una respuesta sea más clara y organizada?
+提示：回答 1-2 句即可，尽量使用 {chosen_terms}。"""
 
 
 def build_dele_output(topic: dict[str, Any], patterns: list[dict[str, str]]) -> str:
-    return f"""**写作任务（80-120 词）**
-题目：围绕“{topic['title']}”，写一小段观点。要求只完成一个清楚段落：1 句引入 + 2 个理由或例子 + 1 句总结。请至少使用 2 个今日词组和 1 个今日句型。
+    return f"""### 第三层：小输出
 
-**口语任务（1 分钟）**
-表达框架：
-- Para empezar, creo que ...
-- Un ejemplo claro es que ...
-- Aunque ..., conviene reconocer que ...
-- En definitiva, ...
+【写作任务】围绕“{topic['title']}”写 60-80 词。不要写长作文，只写一个清楚段落。
 
-你可以先按框架说，不追求复杂。今天的目标是“说得清楚”，不是“说得很长”。"""
+【写作框架】
+1. Para empezar, creo que ...
+2. Un ejemplo claro es que ...
+3. Aunque ..., conviene reconocer que ...
+4. En definitiva, ...
+
+【要求】至少使用 2 个今日词组和 1 个今日句型。今天的目标是说清楚，不是写很长。"""
 
 
 def build_quiz(vocab_entries: list[dict[str, str]], patterns: list[dict[str, str]]) -> str:
     first = vocab_entries[0]["term"]
-    second = vocab_entries[1]["term"]
     first_meaning = vocab_entries[0]["meaning"]
     return f"""1. 词汇选择：No creo que esta explicación sea ______. A. suficiente B. suficientes C. suficiencia
 2. 词汇选择：{first} 的中文意思最接近：A. {first_meaning} B. 完全否定 C. 过去常常
 3. 语法填空：Es necesario que tú ______ con ejemplos. (practicar)
-4. 语法填空：Dudo que esta respuesta ______ demasiado larga. (ser)
+4. 翻译：我担心这个练习太难。
 5. 句型转换：把 “Practicar es importante.” 改成 “Es importante que ...”
-6. 翻译：我担心这个练习太难。
-7. 翻译：为了让回答更清楚，我们需要例子。
-8. 阅读理解：精读段落认为，从 B1 到 B2 过渡时，为什么不能只背规则？
-9. 阅读理解：精读段落提到哪两种方式可以让表达更有条理？
-10. 词汇应用：用 “{second}” 写一个短句。"""
+6. 阅读理解：精读段落提到哪两种方式可以让表达更有条理？"""
 
 
 def build_answers(vocab_entries: list[dict[str, str]]) -> str:
     first = vocab_entries[0]["term"]
-    second = vocab_entries[1]["term"]
-    if "que" in second:
-        application = f"{second.capitalize()} esta estrategia funcione sin práctica diaria."
-    else:
-        application = f"Este ejemplo permite usar '{second}' en un contexto claro."
-    return f"""**控制型练习参考答案**
-1. revise。Es importante que 后面用 subjuntivo，所以 revisar -> revise。
-2. sea。No creo que 表达否定看法，后面用 subjuntivo。
-3. 可写：{first.capitalize()} el estudiante entienda la idea principal con este ejemplo. 这里重点是把概率表达放进完整句；如果表达后面接 que，要注意后面的动词形式。
-4. Es bueno que practiques cada día. 注意 practiques 是 subjuntivo。
-5. Aunque el tema sea difícil, conviene reconocer que se puede explicar con ejemplos. 如果强调事实，也可用 es；如果强调让步假设，用 sea。
-6. Dudo que leer solo las reglas sea suficiente.
-7. Conviene que practiques primero con frases cortas y luego escribas párrafos más largos.
-8. 错句 *revisas* 应改为 revises，因为 Es importante que 后面用 subjuntivo。
-9. 错句 *es* 应改为 sea，因为 No creo que 后面用 subjuntivo。
+    return f"""### 控制练习参考答案
 
-**今日小测试参考答案与解析**
-1. A. suficiente。这里修饰 explicación，阴性单数时 suficiente 形式不变。
-2. A。{first} 的中文意思要按今天词汇表记忆，不要只凭单词外形猜。
-3. practiques。Es necesario que + subjuntivo。
-4. sea。Dudo que + subjuntivo。
-5. Es importante que practiques. 中文同样是“练习很重要”，但西语结构变了。
-6. Temo que este ejercicio sea demasiado difícil. Temo que 后面用 subjuntivo。
-7. Para que la respuesta sea más clara, necesitamos ejemplos. Para que 后面用 subjuntivo。
-8. 因为 B2 不只考规则记忆，还要求在真实语境中表达怀疑、评价、建议和目的。
-9. 可以通过具体例子和连接表达来让表达更有条理。
-10. 示例：{application} 你的答案只要语法正确、意思清楚即可。"""
+【答案 1】revise
+【解析】Es importante que 后面用 subjuntivo，所以 revisar 变成 revise。常见错误是写成 revisa 或 revisas。
+
+【答案 2】sea
+【解析】No creo que 表达否定看法，后面常用 subjuntivo。记住 no creo que sea。
+
+【答案 3】Es bueno que practiques cada día.
+【解析】中文仍然是“每天练习很好”，但西语要换成 que + subjuntivo。
+
+【答案 4】Aunque el tema sea difícil, conviene reconocer que se puede explicar con ejemplos.
+【解析】这里用 aunque + subjuntivo 表示让步假设；如果强调事实，也可以用 es。
+
+### 今日小测试参考答案
+
+【答案 1】A. suficiente
+【解析】suficiente 修饰 explicación，单数形式不变。不要误写成名词 suficiencia。
+
+【答案 2】A
+【解析】{first} 的意思要按今天词汇表记忆，不要只凭单词外形猜。
+
+【答案 3】practiques
+【解析】Es necesario que + subjuntivo。常见错误是写 practicas。
+
+【答案 4】Temo que este ejercicio sea demasiado difícil.
+【解析】Temo que 后面通常用 subjuntivo。记住 temo que sea。
+
+【答案 5】Es importante que practiques.
+【解析】这个转换的重点是把名词化表达改成 que 从句。
+
+【答案 6】可以通过具体例子和连接表达来让表达更有条理。
+【解析】B2 不是单纯用难词，而是让观点、例子和逻辑关系更清楚。"""
 
 
 def build_spaced_review(cards: list[dict[str, Any]], today: date) -> str:
     sections = []
-    for label, days in (("昨天内容", 1), ("3 天前内容", 3), ("7 天前内容", 7)):
+    for label, days, limit in (("昨天 2 个词组", 1, 2), ("3 天前 1 个句型", 3, 1), ("7 天前 1 个语法点", 7, 1)):
         target = (today - timedelta(days=days)).isoformat()
-        items = [card for card in cards if card.get("created_at") == target][:4]
+        items = [card for card in cards if card.get("created_at") == target][:limit]
         if items:
-            input_items = "\n".join(f"- {card['front']}" for card in items[:3])
+            input_items = "\n".join(f"- {card['front']}" for card in items)
             output_items = "\n".join(
                 f"{index}. 用 “{card['front']}” 写一个 10-15 个词的句子。"
-                for index, card in enumerate(items[:3], start=1)
+                for index, card in enumerate(items, start=1)
             )
         else:
             input_items = "- 暂无对应日期的复习卡。系统会从今天开始继续积累。"
-            output_items = "1. 复述今天最重要的 1 个词组。\n2. 复述今天最重要的 1 个句型。\n3. 用今天的语法点写一个短句。"
-        sections.append(f"""**{label}**
-输入：快速回顾词组和句型
+            output_items = "1. 复述今天最重要的 1 个表达。\n2. 用今天的语法点写一个短句。"
+        sections.append(f"""### {label}
+【快速回顾】
 {input_items}
 
-输出：3-5 道小题
+【小题】
 {output_items}""")
     return "\n\n".join(sections)
 
@@ -641,7 +668,7 @@ def due_review_cards(cards_path: Path, today: date, limit: int = 8) -> tuple[lis
 
 def add_new_review_cards(cards: list[dict[str, Any]], today: date, topic: dict[str, Any], vocab: list[dict[str, str]], grammar_note: str) -> list[dict[str, Any]]:
     existing = {card["id"] for card in cards}
-    new_items = [entry["term"] for entry in vocab[:5]] + [grammar_note]
+    new_items = [entry["term"] for entry in vocab[:4]] + [grammar_note]
     for index, item in enumerate(new_items, start=1):
         card_id = f"{today.isoformat()}-{topic['day_in_cycle']}-{index}"
         if card_id in existing:
@@ -681,54 +708,54 @@ def build_lesson(knowledge: dict[str, Any], day_number: int, today: date, cards_
     )
     reading = build_reading(topic, source_pages)
     review_block = build_spaced_review(cards, today)
-    due_note = "\n".join(f"- {card['front']}：{card['back']}" for card in reviews[:3]) or "- 今天没有额外到期卡片；按下方 1/3/7 天复习即可。"
+    due_note = "\n".join(f"- {card['front']}：{card['back']}" for card in reviews[:2]) or "- 今天没有额外到期卡片；按下方 1/3/7 天复习即可。"
 
     markdown = f"""# DELE B2 每日学习 - Día {day_number} - {today.isoformat()}
 
-## 一、输入部分（约 50%）
+## 今日学习目标
+【今日主题】{topic['title']}
 
-## 1. 今日学习目标
-今天主题：{topic['title']}
+【具体目标】今天掌握 {len(vocab_entries)} 个围绕“{topic['title']}”表达观点的核心表达，并能用它们完成 2 个短句和 1 个 60-80 词小段落。
 
-今天的目标不是“大量输出”，而是具体掌握一个小能力：围绕“{topic['title']}”说清楚一个观点，并能用 12-15 个核心表达、4-5 个高频句型和 1-2 个语法点，把 B1 的简单句升级成更稳定的 B2 表达。
+【预计用时】20-30 分钟。先理解，再练习，最后小输出。
 
-B2 目标：{topic['b2_goal']}
+【B2 小目标】{topic['b2_goal']}
 
-材料来源：{source_pages or '知识库综合复习'}
+【材料来源】{source_pages or '知识库综合复习'}
 
-额外到期复习卡：
+【额外到期复习卡】
 {due_note}
 
-## 2. 核心词汇与词组（12-15 个）
+## 输入部分：先理解
+
+## 核心词汇与词组（6-8 个）
 {format_vocab(vocab_entries)}
 
-## 3. 高频句型（4-5 个）
+## 高频句型（2-3 个）
 {format_patterns(sentence_patterns)}
 
-## 4. 语法重点（1-2 个）
+## 语法重点（1 个）
 {format_grammar(grammar_points)}
 
-## 5. 精读段落（1 段）
+## 精读段落（1 段）
 {format_reading(reading)}
 
-## 二、输出部分（约 50%）
+## 输出部分：再练习
 
-## 6. 控制型练习
+## 分级输出练习
 {build_controlled_practice(vocab_entries, sentence_patterns)}
 
-## 7. 半开放输出
 {build_half_open_output(vocab_entries, sentence_patterns)}
 
-## 8. DELE B2 输出训练
 {build_dele_output(topic, sentence_patterns)}
 
-## 9. 今日小测试
+## 今日小测试（5-6 题）
 {build_quiz(vocab_entries, sentence_patterns)}
 
-## 10. 答案与解析
+## 答案与解析
 {build_answers(vocab_entries)}
 
-## 11. 间隔复习
+## 间隔复习
 {review_block}
 """
 

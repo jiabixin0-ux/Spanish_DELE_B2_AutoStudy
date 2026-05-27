@@ -60,7 +60,19 @@ class DailyLessonTests(unittest.TestCase):
             cards_path = Path(tmp) / "cards.json"
             lesson = build_lesson(kb, 1, date(2026, 5, 26), cards_path)
             markdown = lesson["markdown"]
-            for section in ("词汇", "句型", "语法", "精读", "写作任务", "口语任务", "小测试", "答案", "间隔复习"):
+            for section in (
+                "今日学习目标",
+                "输入部分：先理解",
+                "词汇",
+                "句型",
+                "语法",
+                "精读",
+                "分级输出练习",
+                "写作任务",
+                "小测试",
+                "答案",
+                "间隔复习",
+            ):
                 self.assertIn(section, markdown)
 
 
