@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      DELE_COURSE_START_DATE: '2026-05-27'
+      DELE_TIMEZONE: Asia/Shanghai
 
     steps:
       - name: Checkout repository

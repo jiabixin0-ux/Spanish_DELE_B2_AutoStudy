@@ -19,6 +19,8 @@ DEFAULT_TEXT = RAW_DIR / "dele_material.txt"
 DEFAULT_KNOWLEDGE_BASE = PROCESSED_DIR / "knowledge_base.json"
 DEFAULT_PROGRESS = DATA_DIR / "progress.json"
 DEFAULT_REVIEW_CARDS = DATA_DIR / "review_cards.json"
+DEFAULT_COURSE_START_DATE = os.getenv("DELE_COURSE_START_DATE", "2026-05-27")
+DEFAULT_TIMEZONE = os.getenv("DELE_TIMEZONE", "Asia/Shanghai")
 
 
 def ensure_project_dirs() -> None:

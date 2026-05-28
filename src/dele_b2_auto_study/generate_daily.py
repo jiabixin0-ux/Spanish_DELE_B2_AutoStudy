@@ -8,12 +8,15 @@ import shutil
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from .config import (
+    DEFAULT_COURSE_START_DATE,
     DAILY_OUTPUT_DIR,
     DEFAULT_KNOWLEDGE_BASE,
     DEFAULT_PROGRESS,
     DEFAULT_REVIEW_CARDS,
+    DEFAULT_TIMEZONE,
     display_path,
     ensure_project_dirs,
 )
@@ -265,7 +268,13 @@ def write_json(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def choose_lesson_day(progress_path: Path, today: date, day_override: int | None, cycle_length: int) -> tuple[int, dict[str, Any]]:
+def choose_lesson_day(
+    progress_path: Path,
+    today: date,
+    day_override: int | None,
+    cycle_length: int,
+    default_start_date: str = DEFAULT_COURSE_START_DATE,
+) -> tuple[int, dict[str, Any]]:
     progress = load_json(progress_path, {})
     if day_override:
         progress.setdefault("start_date", today.isoformat())
@@ -274,7 +283,9 @@ def choose_lesson_day(progress_path: Path, today: date, day_override: int | None
         return day_override, progress
 
     if "start_date" not in progress:
-        progress["start_date"] = today.isoformat()
+        progress["start_date"] = default_start_date
+    elif date.fromisoformat(progress["start_date"]) < date.fromisoformat(default_start_date):
+        progress["start_date"] = default_start_date
     start = date.fromisoformat(progress["start_date"])
     absolute_day = (today - start).days + 1
     if absolute_day < 1:
@@ -284,6 +295,10 @@ def choose_lesson_day(progress_path: Path, today: date, day_override: int | None
     progress["last_day_number"] = day_number
     progress["absolute_day"] = absolute_day
     return day_number, progress
+
+
+def current_lesson_date() -> date:
+    return datetime.now(ZoneInfo(DEFAULT_TIMEZONE)).date()
 
 
 def readability_score(text: str) -> int:
@@ -813,7 +828,7 @@ def main() -> int:
     if not args.knowledge.exists():
         raise SystemExit(f"缺少知识库：{display_path(args.knowledge)}。请先运行 split_knowledge.py。")
 
-    today = date.fromisoformat(args.lesson_date) if args.lesson_date else date.today()
+    today = date.fromisoformat(args.lesson_date) if args.lesson_date else current_lesson_date()
     knowledge = json.loads(args.knowledge.read_text(encoding="utf-8"))
     day_number, progress = choose_lesson_day(args.progress, today, args.day, len(knowledge["course_plan"]))
     lesson = build_lesson(knowledge, day_number, today, args.review_cards)

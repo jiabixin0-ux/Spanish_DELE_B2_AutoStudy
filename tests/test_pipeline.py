@@ -40,11 +40,27 @@ class DailyLessonTests(unittest.TestCase):
     def test_choose_lesson_day_is_date_based(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             progress = Path(tmp) / "progress.json"
-            day, state = choose_lesson_day(progress, date(2026, 5, 26), None, 10)
+            day, state = choose_lesson_day(progress, date(2026, 5, 27), None, 10)
             self.assertEqual(day, 1)
             progress.write_text(json.dumps(state), encoding="utf-8")
-            next_day, _ = choose_lesson_day(progress, date(2026, 5, 27), None, 10)
+            next_day, _ = choose_lesson_day(progress, date(2026, 5, 28), None, 10)
             self.assertEqual(next_day, 2)
+
+    def test_choose_lesson_day_is_stable_without_progress_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            progress = Path(tmp) / "missing-progress.json"
+            first_day, _ = choose_lesson_day(progress, date(2026, 5, 27), None, 10)
+            second_day, _ = choose_lesson_day(progress, date(2026, 5, 28), None, 10)
+            self.assertEqual(first_day, 1)
+            self.assertEqual(second_day, 2)
+
+    def test_choose_lesson_day_clamps_old_local_start_date(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            progress = Path(tmp) / "progress.json"
+            progress.write_text(json.dumps({"start_date": "2026-05-26"}), encoding="utf-8")
+            day, state = choose_lesson_day(progress, date(2026, 5, 28), None, 10)
+            self.assertEqual(day, 2)
+            self.assertEqual(state["start_date"], "2026-05-27")
 
     def test_lesson_contains_required_sections(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
