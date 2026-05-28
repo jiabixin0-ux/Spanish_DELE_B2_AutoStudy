@@ -54,7 +54,7 @@ PYTHONPATH=src python3 -m dele_b2_auto_study.send_email --dry-run
 
 ## 每天早上 8 点自动发送
 
-GitHub Actions 会在每天北京时间早上 8 点自动运行，也可以在 GitHub 页面手动触发：
+GitHub Actions 会在每天北京时间早上 8:17 自动运行，也可以在 GitHub 页面手动触发。选择 8:17 是为了避开 GitHub Actions 每小时整点的高负载窗口，降低定时任务被延迟或丢弃的概率：
 
 ```text
 Actions -> Daily DELE B2 Study Email -> Run workflow

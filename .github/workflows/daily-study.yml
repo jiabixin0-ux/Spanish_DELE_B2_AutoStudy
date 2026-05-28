@@ -3,7 +3,8 @@ name: Daily DELE B2 Study Email
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    # 00:17 UTC = 08:17 Beijing time. Avoid minute 0 because GitHub may delay or drop schedules at the start of an hour.
+    - cron: '17 0 * * *'
 
 jobs:
   send-daily-study-email:
