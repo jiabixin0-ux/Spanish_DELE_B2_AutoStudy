@@ -5,6 +5,8 @@ on:
   schedule:
     # 00:17 UTC = 08:17 Beijing time. Avoid minute 0 because GitHub may delay or drop schedules at the start of an hour.
     - cron: '17 0 * * *'
+    # One-time cloud test: 01:50 UTC on 2026-05-28 = 09:50 Beijing time.
+    - cron: '50 1 28 5 *'
 
 jobs:
   send-daily-study-email:
@@ -15,22 +17,37 @@ jobs:
       DELE_TIMEZONE: Asia/Shanghai
 
     steps:
+      - name: Check one-time test schedule
+        id: schedule-gate
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "${{ github.event.schedule }}" = "50 1 28 5 *" ] && [ "$(TZ=Asia/Shanghai date +%F)" != "2026-05-28" ]; then
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout repository
+        if: steps.schedule-gate.outputs.should_run == 'true'
         uses: actions/checkout@v4
 
       - name: Setup Python 3.11
+        if: steps.schedule-gate.outputs.should_run == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
+        if: steps.schedule-gate.outputs.should_run == 'true'
         run: pip install -r requirements.txt
 
       - name: Generate daily lesson
+        if: steps.schedule-gate.outputs.should_run == 'true'
         run: python3 scripts/generate_daily_lesson.py
 
       - name: Generate Word attachment
+        if: steps.schedule-gate.outputs.should_run == 'true'
         run: python3 scripts/generate_word.py
 
       - name: Send email
+        if: steps.schedule-gate.outputs.should_run == 'true'
         run: python3 scripts/send_email.py
