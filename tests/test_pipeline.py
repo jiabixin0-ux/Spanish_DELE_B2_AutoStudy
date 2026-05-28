@@ -51,8 +51,11 @@ class DailyLessonTests(unittest.TestCase):
             progress = Path(tmp) / "missing-progress.json"
             first_day, _ = choose_lesson_day(progress, date(2026, 5, 27), None, 10)
             second_day, _ = choose_lesson_day(progress, date(2026, 5, 28), None, 10)
+            eleventh_day, state = choose_lesson_day(progress, date(2026, 6, 6), None, 10)
             self.assertEqual(first_day, 1)
             self.assertEqual(second_day, 2)
+            self.assertEqual(eleventh_day, 11)
+            self.assertEqual(state["cycle_day_number"], 1)
 
     def test_choose_lesson_day_clamps_old_local_start_date(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -90,6 +93,43 @@ class DailyLessonTests(unittest.TestCase):
                 "间隔复习",
             ):
                 self.assertIn(section, markdown)
+
+    def test_spaced_review_is_generated_from_dates_without_cards_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            kb = build_knowledge_base(
+                [
+                    {
+                        "page": 1,
+                        "text": "Aunque el tema parece sencillo, conviene argumentar con ejemplos concretos. "
+                        "El texto propone comparar ventajas e inconvenientes y expresar una opinión matizada.",
+                    }
+                ]
+            )
+            lesson = build_lesson(kb, 8, date(2026, 6, 3), Path(tmp) / "missing-cards.json")
+            markdown = lesson["markdown"]
+            self.assertIn("昨天 2 个词组", markdown)
+            self.assertIn("3 天前 1 个句型", markdown)
+            self.assertIn("7 天前 1 个语法点", markdown)
+            self.assertIn("Día 1", markdown)
+            self.assertNotIn("暂无对应日期的复习卡", markdown)
+
+    def test_repeated_cycle_day_still_changes_content(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            kb = build_knowledge_base(
+                [
+                    {
+                        "page": 1,
+                        "text": "Aunque el tema parece sencillo, conviene argumentar con ejemplos concretos. "
+                        "El texto propone comparar ventajas e inconvenientes y expresar una opinión matizada.",
+                    }
+                ]
+            )
+            cards_path = Path(tmp) / "cards.json"
+            first_cycle = build_lesson(kb, 1, date(2026, 5, 27), cards_path)["markdown"]
+            second_cycle = build_lesson(kb, 11, date(2026, 6, 6), cards_path)["markdown"]
+            self.assertIn("Día 1", first_cycle)
+            self.assertIn("Día 11", second_cycle)
+            self.assertNotEqual(first_cycle, second_cycle)
 
 
 if __name__ == "__main__":

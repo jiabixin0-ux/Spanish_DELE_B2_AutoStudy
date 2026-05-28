@@ -280,6 +280,7 @@ def choose_lesson_day(
         progress.setdefault("start_date", today.isoformat())
         progress["last_generated_date"] = today.isoformat()
         progress["last_day_number"] = day_override
+        progress["cycle_day_number"] = ((day_override - 1) % cycle_length) + 1
         return day_override, progress
 
     if "start_date" not in progress:
@@ -290,11 +291,11 @@ def choose_lesson_day(
     absolute_day = (today - start).days + 1
     if absolute_day < 1:
         absolute_day = 1
-    day_number = ((absolute_day - 1) % cycle_length) + 1
     progress["last_generated_date"] = today.isoformat()
-    progress["last_day_number"] = day_number
+    progress["last_day_number"] = absolute_day
+    progress["cycle_day_number"] = ((absolute_day - 1) % cycle_length) + 1
     progress["absolute_day"] = absolute_day
-    return day_number, progress
+    return absolute_day, progress
 
 
 def current_lesson_date() -> date:
@@ -308,11 +309,27 @@ def readability_score(text: str) -> int:
     return len(words) * 4 - non_latin_noise - symbol_noise
 
 
-def select_chunks(knowledge: dict[str, Any], topic: dict[str, Any], limit: int = 3) -> list[dict[str, Any]]:
+def select_chunks(knowledge: dict[str, Any], topic: dict[str, Any], limit: int = 3, variant: int = 0) -> list[dict[str, Any]]:
     by_id = {chunk["id"]: chunk for chunk in knowledge["chunks"]}
     chunks = [by_id[chunk_id] for chunk_id in topic.get("source_chunk_ids", []) if chunk_id in by_id]
     readable_chunks = [chunk for chunk in chunks if len(chunk.get("text", "")) > 120]
-    return sorted(readable_chunks, key=lambda chunk: readability_score(chunk["text"]), reverse=True)[:limit]
+    ranked = sorted(readable_chunks, key=lambda chunk: readability_score(chunk["text"]), reverse=True)
+    return rotate_items(ranked, variant)[:limit]
+
+
+def rotate_items(items: list[Any], offset: int) -> list[Any]:
+    if not items:
+        return []
+    offset = offset % len(items)
+    return items[offset:] + items[:offset]
+
+
+def topic_for_lesson(plan: list[dict[str, Any]], lesson_day: int) -> dict[str, Any]:
+    return plan[(lesson_day - 1) % len(plan)]
+
+
+def variant_for_lesson(lesson_day: int, plan_length: int) -> int:
+    return (lesson_day - 1) // plan_length
 
 
 def clean_excerpt(text: str, max_chars: int = 950) -> str:
@@ -376,13 +393,14 @@ def vocab_example(term: str, topic: dict[str, Any]) -> tuple[str, str]:
     )
 
 
-def build_vocab_entries(topic: dict[str, Any], source_terms: list[str]) -> list[dict[str, str]]:
+def build_vocab_entries(topic: dict[str, Any], source_terms: list[str], variant: int = 0) -> list[dict[str, str]]:
     topic_terms = B2_VOCAB_BANK.get(topic["title"], [])
     clean_source_terms = [
         term for term in source_terms
         if term in VOCAB_MEANINGS and term not in topic_terms
     ]
-    selected = list(dict.fromkeys(topic_terms + clean_source_terms))[:6]
+    candidate_terms = list(dict.fromkeys(topic_terms + clean_source_terms))
+    selected = rotate_items(candidate_terms, variant * 3)[:6]
     entries = []
     for term in selected:
         example, translation = vocab_example(term, topic)
@@ -424,8 +442,8 @@ def vocab_usage(term: str, topic: dict[str, Any]) -> str:
     return f"适合围绕“{topic['title']}”补充观点、例子或限制条件。"
 
 
-def build_sentence_patterns(topic: dict[str, Any]) -> list[dict[str, str]]:
-    rows = PATTERN_LIBRARY.get(topic["title"], DEFAULT_PATTERNS)[:3]
+def build_sentence_patterns(topic: dict[str, Any], variant: int = 0) -> list[dict[str, str]]:
+    rows = rotate_items(PATTERN_LIBRARY.get(topic["title"], DEFAULT_PATTERNS), variant)[:3]
     return [
         {
             "structure": row[0],
@@ -439,8 +457,8 @@ def build_sentence_patterns(topic: dict[str, Any]) -> list[dict[str, str]]:
     ]
 
 
-def build_grammar_points(topic: dict[str, Any]) -> list[dict[str, Any]]:
-    return GRAMMAR_LIBRARY[grammar_key(topic)][:1]
+def build_grammar_points(topic: dict[str, Any], variant: int = 0) -> list[dict[str, Any]]:
+    return rotate_items(GRAMMAR_LIBRARY[grammar_key(topic)], variant)[:1]
 
 
 def build_reading(topic: dict[str, Any], source_pages: str) -> dict[str, Any]:
@@ -640,26 +658,77 @@ def build_answers(vocab_entries: list[dict[str, str]]) -> str:
 【解析】B2 不是单纯用难词，而是让观点、例子和逻辑关系更清楚。"""
 
 
-def build_spaced_review(cards: list[dict[str, Any]], today: date) -> str:
+def build_spaced_review(plan: list[dict[str, Any]], current_day: int, today: date) -> str:
+    def past_topic(day_number: int) -> tuple[dict[str, Any], int]:
+        topic = topic_for_lesson(plan, day_number)
+        return topic, variant_for_lesson(day_number, len(plan))
+
     sections = []
-    for label, days, limit in (("昨天 2 个词组", 1, 2), ("3 天前 1 个句型", 3, 1), ("7 天前 1 个语法点", 7, 1)):
-        target = (today - timedelta(days=days)).isoformat()
-        items = [card for card in cards if card.get("created_at") == target][:limit]
-        if items:
-            input_items = "\n".join(f"- {card['front']}" for card in items)
-            output_items = "\n".join(
-                f"{index}. 用 “{card['front']}” 写一个 10-15 个词的句子。"
-                for index, card in enumerate(items, start=1)
-            )
-        else:
-            input_items = "- 暂无对应日期的复习卡。系统会从今天开始继续积累。"
-            output_items = "1. 复述今天最重要的 1 个表达。\n2. 用今天的语法点写一个短句。"
-        sections.append(f"""### {label}
+
+    if current_day > 1:
+        target_day = current_day - 1
+        topic, variant = past_topic(target_day)
+        vocab = build_vocab_entries(topic, [], variant)
+        items = vocab[:2]
+        quick_review = "\n".join(
+            f"- {entry['term']}：{entry['meaning']}。例句：{entry['example']}"
+            for entry in items
+        )
+        tasks = "\n".join(
+            f"{index}. 用 “{entry['term']}” 写一个 10-15 个词的句子，并检查固定介词或 que 从句。"
+            for index, entry in enumerate(items, start=1)
+        )
+    else:
+        quick_review = "- 今天是第 1 天，还没有昨天的内容可复习。请把今天最有用的 2 个词组圈出来，明天会自动回收。"
+        tasks = "1. 从今天词汇里选 1 个表达，写一个 10-15 个词的句子。"
+    sections.append(f"""### 昨天 2 个词组
 【快速回顾】
-{input_items}
+{quick_review}
 
 【小题】
-{output_items}""")
+{tasks}""")
+
+    if current_day > 3:
+        target_day = current_day - 3
+        topic, variant = past_topic(target_day)
+        pattern = build_sentence_patterns(topic, variant)[0]
+        target_date = (today - timedelta(days=3)).isoformat()
+        quick_review = (
+            f"- Día {target_day}（{target_date}）：{pattern['structure']}。"
+            f"用法：{pattern['explanation']}。例句：{pattern['example']}"
+        )
+        tasks = f"1. 保留这个结构，换成你今天的学习主题写一句新句子。"
+    else:
+        quick_review = "- 还没到第 4 天，所以暂时没有 3 天前的句型可复习。"
+        tasks = "1. 复述今天最重要的 1 个句型，并口头替换一个关键词。"
+    sections.append(f"""### 3 天前 1 个句型
+【快速回顾】
+{quick_review}
+
+【小题】
+{tasks}""")
+
+    if current_day > 7:
+        target_day = current_day - 7
+        topic, variant = past_topic(target_day)
+        grammar = build_grammar_points(topic, variant)[0]
+        example, translation = grammar["examples"][0]
+        target_date = (today - timedelta(days=7)).isoformat()
+        quick_review = (
+            f"- Día {target_day}（{target_date}）：{grammar['title']}。"
+            f"规则提醒：{grammar['rule']} 例句：{example} / {translation}"
+        )
+        tasks = "1. 用这个语法点写一个短句。2. 标出最容易写错的动词形式或连接词。"
+    else:
+        quick_review = "- 还没到第 8 天，所以暂时没有 7 天前的语法点可复习。"
+        tasks = "1. 用今天的语法点写一句短句，明天继续回收。"
+    sections.append(f"""### 7 天前 1 个语法点
+【快速回顾】
+{quick_review}
+
+【小题】
+{tasks}""")
+
     return "\n\n".join(sections)
 
 
@@ -704,26 +773,26 @@ def add_new_review_cards(cards: list[dict[str, Any]], today: date, topic: dict[s
 
 def build_lesson(knowledge: dict[str, Any], day_number: int, today: date, cards_path: Path) -> dict[str, str]:
     plan = knowledge["course_plan"]
-    topic = plan[day_number - 1]
-    chunks = select_chunks(knowledge, topic)
+    topic = topic_for_lesson(plan, day_number)
+    variant = variant_for_lesson(day_number, len(plan))
+    chunks = select_chunks(knowledge, topic, variant=variant)
     source_terms = []
     for chunk in chunks:
         source_terms.extend(extract_terms(chunk["text"], limit=6))
-    vocab_entries = build_vocab_entries(topic, source_terms)
-    sentence_patterns = build_sentence_patterns(topic)
-    grammar_points = build_grammar_points(topic)
-    grammar_note = grammar_points[0]["title"]
-    reviews, cards = due_review_cards(cards_path, today)
-    cards = add_new_review_cards(cards, today, topic, vocab_entries, grammar_note)
-    write_json(cards_path, cards)
+    vocab_entries = build_vocab_entries(topic, source_terms, variant)
+    sentence_patterns = build_sentence_patterns(topic, variant)
+    grammar_points = build_grammar_points(topic, variant)
 
     source_pages = ", ".join(
         f"p.{chunk['page_start']}" if chunk["page_start"] == chunk["page_end"] else f"p.{chunk['page_start']}-{chunk['page_end']}"
         for chunk in chunks
     )
     reading = build_reading(topic, source_pages)
-    review_block = build_spaced_review(cards, today)
-    due_note = "\n".join(f"- {card['front']}：{card['back']}" for card in reviews[:2]) or "- 今天没有额外到期卡片；按下方 1/3/7 天复习即可。"
+    review_block = build_spaced_review(plan, day_number, today)
+    if day_number == 1:
+        due_note = "- 今天是课程第 1 天，先建立输入和输出节奏；从明天开始自动加入间隔复习。"
+    else:
+        due_note = "- 今天会复习昨天的 2 个词组；到第 4 天加入 3 天前句型，到第 8 天加入 7 天前语法点。"
 
     markdown = f"""# DELE B2 每日学习 - Día {day_number} - {today.isoformat()}
 
