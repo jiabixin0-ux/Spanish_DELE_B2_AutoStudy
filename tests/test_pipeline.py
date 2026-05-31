@@ -32,7 +32,7 @@ class KnowledgeSplitTests(unittest.TestCase):
         ]
         kb = build_knowledge_base(pages)
         self.assertGreater(kb["chunk_count"], 0)
-        self.assertEqual(kb["target_level"], "DELE B2")
+        self.assertEqual(kb["target_level"], "B1 consolidation with gradual DELE B2 bridge")
         self.assertTrue(kb["course_plan"][0]["source_chunk_ids"])
 
 
@@ -80,14 +80,14 @@ class DailyLessonTests(unittest.TestCase):
             lesson = build_lesson(kb, 1, date(2026, 5, 26), cards_path)
             markdown = lesson["markdown"]
             for section in (
-                "今日学习目标",
-                "输入部分：先理解",
-                "词汇",
-                "句型",
-                "语法",
-                "精读",
-                "分级输出练习",
-                "写作任务",
+                "西语 B1 巩固与 B2 过渡",
+                "今日目标",
+                "今日必背词组",
+                "今日扩展词汇",
+                "PDF 精读",
+                "今日语法小点",
+                "轻量输出训练",
+                "小段输出",
                 "小测试",
                 "答案",
                 "间隔复习",
@@ -107,9 +107,9 @@ class DailyLessonTests(unittest.TestCase):
             )
             lesson = build_lesson(kb, 8, date(2026, 6, 3), Path(tmp) / "missing-cards.json")
             markdown = lesson["markdown"]
-            self.assertIn("昨天 2 个词组", markdown)
-            self.assertIn("3 天前 1 个句型", markdown)
-            self.assertIn("7 天前 1 个语法点", markdown)
+            self.assertIn("昨天的 5 个词组", markdown)
+            self.assertIn("3 天前的 5 个词汇", markdown)
+            self.assertIn("7 天前的 1 个语法点", markdown)
             self.assertIn("Día 1", markdown)
             self.assertNotIn("暂无对应日期的复习卡", markdown)
 

@@ -250,8 +250,8 @@ def build_knowledge_base(pages: list[dict[str, object]]) -> dict[str, object]:
     return {
         "version": 1,
         "source_level": "B1 aproximadamente",
-        "target_level": "DELE B2",
-        "strategy": "The source PDF is reorganized by communicative and grammar goals instead of page order.",
+        "target_level": "B1 consolidation with gradual DELE B2 bridge",
+        "strategy": "The B1 source PDF is reorganized by communicative and grammar goals, with vocabulary-first daily lessons.",
         "chunk_count": len(chunks),
         "chunks": chunks,
         "course_plan": plan,

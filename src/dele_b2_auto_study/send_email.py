@@ -29,7 +29,7 @@ def send_gmail(message: EmailMessage, password: str, host: str = "smtp.gmail.com
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Send latest DELE B2 lesson via Gmail.")
+    parser = argparse.ArgumentParser(description="Send latest Spanish B1 consolidation and B2 bridge lesson via Gmail.")
     parser.add_argument("--lesson", type=Path, default=DAILY_OUTPUT_DIR / "latest_lesson.md")
     parser.add_argument("--html", type=Path, default=DAILY_OUTPUT_DIR / "latest_lesson.html")
     parser.add_argument("--subject-file", type=Path, default=DAILY_OUTPUT_DIR / "latest_subject.txt")
@@ -56,7 +56,7 @@ def main() -> int:
     subject = (
         args.subject_file.read_text(encoding="utf-8").strip()
         if args.subject_file.exists()
-        else "DELE B2 每日学习"
+        else "西语 B1 巩固与 B2 过渡每日学习"
     )
     message = build_message(sender, recipient, subject, text_body, html_body)
 

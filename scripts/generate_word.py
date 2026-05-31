@@ -12,6 +12,7 @@ if VENDOR_DIR.exists() and str(VENDOR_DIR) not in sys.path:
 
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
+from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT, WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -70,6 +71,40 @@ def add_bottom_border(paragraph, color: str = "B7C4D6") -> None:
     bottom.set(qn("w:space"), "4")
     bottom.set(qn("w:color"), color)
     border.append(bottom)
+
+
+def set_cell_shading(cell, fill: str) -> None:
+    tc_pr = cell._tc.get_or_add_tcPr()
+    shading = tc_pr.find(qn("w:shd"))
+    if shading is None:
+        shading = OxmlElement("w:shd")
+        tc_pr.append(shading)
+    shading.set(qn("w:fill"), fill)
+
+
+def set_cell_width(cell, width_twips: int) -> None:
+    tc_pr = cell._tc.get_or_add_tcPr()
+    width = tc_pr.find(qn("w:tcW"))
+    if width is None:
+        width = OxmlElement("w:tcW")
+        tc_pr.append(width)
+    width.set(qn("w:w"), str(width_twips))
+    width.set(qn("w:type"), "dxa")
+
+
+def set_cell_margins(cell, margin_twips: int = 100) -> None:
+    tc_pr = cell._tc.get_or_add_tcPr()
+    margins = tc_pr.find(qn("w:tcMar"))
+    if margins is None:
+        margins = OxmlElement("w:tcMar")
+        tc_pr.append(margins)
+    for edge in ("top", "left", "bottom", "right"):
+        node = margins.find(qn(f"w:{edge}"))
+        if node is None:
+            node = OxmlElement(f"w:{edge}")
+            margins.append(node)
+        node.set(qn("w:w"), str(margin_twips))
+        node.set(qn("w:type"), "dxa")
 
 
 def configure_document(document: Document) -> None:
@@ -244,14 +279,71 @@ def add_example_text(document: Document, text: str, chinese: bool = False) -> No
         run.font.color.rgb = RGBColor.from_string(SPANISH_BLUE)
 
 
+def is_table_line(line: str) -> bool:
+    stripped = line.strip()
+    return stripped.startswith("|") and stripped.endswith("|") and stripped.count("|") >= 2
+
+
+def is_table_separator(line: str) -> bool:
+    cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+    return bool(cells) and all(re.fullmatch(r":?-{3,}:?", cell or "") for cell in cells)
+
+
+def split_table_row(line: str) -> list[str]:
+    return [strip_markdown_emphasis(cell.strip()) for cell in line.strip().strip("|").split("|")]
+
+
+def add_markdown_table(document: Document, table_lines: list[str]) -> None:
+    rows = [split_table_row(line) for line in table_lines if not is_table_separator(line)]
+    if not rows:
+        return
+    column_count = max(len(row) for row in rows)
+    table = document.add_table(rows=len(rows), cols=column_count)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.style = "Table Grid"
+    widths = [1500, 1300, 3600, 3200]
+
+    for row_index, row in enumerate(rows):
+        for col_index in range(column_count):
+            cell = table.cell(row_index, col_index)
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+            set_cell_margins(cell, 110)
+            if col_index < len(widths):
+                set_cell_width(cell, widths[col_index])
+            if row_index == 0:
+                set_cell_shading(cell, SOFT_BLUE)
+            text = row[col_index] if col_index < len(row) else ""
+            paragraph = cell.paragraphs[0]
+            paragraph.paragraph_format.space_after = Pt(2)
+            paragraph.paragraph_format.line_spacing = 1.12
+            run = paragraph.add_run(text)
+            set_run_font(run, size_pt=9.3 if row_index else 9.8, bold=row_index == 0)
+            if row_index == 0:
+                run.font.color.rgb = RGBColor.from_string(ACCENT_BLUE)
+
+    spacer = document.add_paragraph()
+    spacer.paragraph_format.space_after = Pt(8)
+
+
 def markdown_to_docx(markdown: str, output_path: Path) -> None:
     document = Document()
     configure_document(document)
     next_example_style: str | None = None
 
-    for raw_line in markdown.splitlines():
+    lines = markdown.splitlines()
+    index = 0
+    while index < len(lines):
+        raw_line = lines[index]
         line = raw_line.strip()
+        index += 1
         if not line:
+            continue
+        if is_table_line(line):
+            table_lines = [line]
+            while index < len(lines) and is_table_line(lines[index].strip()):
+                table_lines.append(lines[index].strip())
+                index += 1
+            add_markdown_table(document, table_lines)
             continue
         if line.startswith("# "):
             add_title(document, line[2:])

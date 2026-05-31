@@ -1,4 +1,4 @@
-name: Daily DELE B2 Study Email
+name: Daily Spanish B1-B2 Study Email
 
 on:
   workflow_dispatch:

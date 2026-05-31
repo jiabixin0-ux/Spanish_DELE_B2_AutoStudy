@@ -50,9 +50,9 @@ def build_message(sender_email: str, receiver_email: str, attachment_path: Path)
     message = EmailMessage()
     message["From"] = sender_email
     message["To"] = receiver_email
-    message["Subject"] = "DELE B2 每日学习"
+    message["Subject"] = "西语 B1 巩固与 B2 过渡每日学习"
     message["Message-ID"] = make_msgid(domain="dele-b2-auto-study.local")
-    message.set_content("今日 DELE B2 学习内容见附件。")
+    message.set_content("今日西语 B1 巩固与 B2 过渡学习讲义见附件。")
     message.add_attachment(
         attachment_path.read_bytes(),
         maintype="application",

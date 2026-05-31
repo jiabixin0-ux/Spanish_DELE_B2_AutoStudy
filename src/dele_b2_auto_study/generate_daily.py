@@ -83,6 +83,128 @@ B2_VOCAB_BANK = {
     ],
 }
 
+B1_PHRASE_BANK = {
+    "Opinar y matizar en temas cotidianos": [
+        "estar de acuerdo", "no estar de acuerdo", "en mi opinión", "creo que",
+        "me parece que", "tener razón", "decir la verdad", "exagerar un poco",
+        "la calidad de", "me importa", "a veces", "por ejemplo",
+    ],
+    "Subjuntivo para valoración y duda": [
+        "es necesario que", "es importante que", "puede que", "dudo que",
+        "no creo que", "me parece normal que", "te importa que", "esperar un poco",
+        "es mejor que", "es bueno que", "es posible que", "tener que",
+    ],
+    "Narrar experiencias y cambios": [
+        "durante ese período", "empezar a", "volver a", "acabar de",
+        "dar conferencias", "asistir a", "publicar un libro", "terminar una obra",
+        "antes de", "después de", "por primera vez", "conocer a",
+    ],
+    "Contrastar ventajas e inconvenientes": [
+        "por un lado", "por otro lado", "en cambio", "aunque",
+        "tener la ventaja de", "tener el inconveniente de", "merecer la pena",
+        "depender de", "ser más barato", "ser más cómodo", "a pesar de", "comparar con",
+    ],
+    "Expresar hipótesis y condiciones": [
+        "si tengo tiempo", "si es posible", "en caso de", "a menos que",
+        "por si acaso", "tal vez", "quizá", "depende de",
+        "sería mejor", "me gustaría", "tener que", "para poder",
+    ],
+    "Escribir correos formales": [
+        "me dirijo a usted", "quisiera solicitar", "le escribo para", "con respecto a",
+        "muchas gracias por", "quedo a la espera", "un saludo cordial",
+        "a la mayor brevedad posible", "solicitar información", "ponerse en contacto",
+        "adjuntar un documento", "recibir una respuesta",
+    ],
+    "Conectores para organizar argumentos": [
+        "en primer lugar", "además", "también", "por eso",
+        "sin embargo", "por ejemplo", "en resumen", "por último",
+        "es decir", "de esta manera", "por una parte", "por otra parte",
+    ],
+    "Describir datos, tendencias y cambios sociales": [
+        "la mayoría de", "una minoría", "aumentar poco a poco", "disminuir mucho",
+        "mantenerse estable", "según los datos", "en comparación con", "a lo largo de",
+        "el porcentaje de", "un cambio importante", "cada vez más", "cada vez menos",
+    ],
+    "Reformular y evitar repeticiones": [
+        "es decir", "dicho de otro modo", "en otras palabras", "hacer referencia a",
+        "este tema", "esta situación", "por ejemplo", "en este sentido",
+        "para explicar mejor", "volver a decir", "ser parecido a", "no solo",
+    ],
+    "Debatir soluciones y propuestas": [
+        "proponer una solución", "tomar medidas", "hacer frente a", "mejorar la situación",
+        "buscar una alternativa", "llegar a un acuerdo", "poner en marcha", "llevar a cabo",
+        "sería recomendable", "sería útil", "trabajar juntos", "resolver el problema",
+    ],
+}
+
+COMMON_B1_VOCAB = [
+    "acuerdo", "anuncio", "calidad", "producto", "verdad", "marca", "dinero",
+    "gente", "opinión", "ejemplo", "tema", "problema", "solución", "ciudad",
+    "trabajo", "estudio", "tiempo", "familia", "viaje", "cambio", "persona",
+    "lugar", "forma", "actividad", "experiencia", "resultado", "pregunta",
+    "respuesta", "razón", "necesario", "importante", "posible", "mejor",
+    "difícil", "fácil", "normal", "frecuente", "útil", "claro", "nuevo",
+    "primero", "después", "antes", "durante", "siempre", "nunca", "también",
+    "aunque", "porque", "cuando", "donde", "comprar", "estudiar", "leer",
+    "escribir", "escuchar", "hablar", "pensar", "creer", "decir", "necesitar",
+    "querer", "poder", "hacer", "tener", "estar", "ser", "ir", "volver",
+]
+
+B1_MEANINGS = {
+    "acuerdo": "同意、一致", "anuncio": "广告", "calidad": "质量", "producto": "产品",
+    "verdad": "事实、真相", "marca": "品牌", "dinero": "钱", "gente": "人们",
+    "personas": "人们", "pisos": "公寓、住房", "ciudades": "城市", "hijos": "子女",
+    "revista": "杂志", "poemas": "诗歌", "poeta": "诗人", "grandes": "大的、重要的",
+    "vivienda": "住房", "soledad": "孤独",
+    "precio": "价格", "mayores": "老年人", "saludos": "问候", "teléfono": "电话",
+    "cuanto": "至于、就……而言",
+    "opinión": "观点", "ejemplo": "例子", "tema": "主题", "problema": "问题",
+    "solución": "解决办法", "ciudad": "城市", "trabajo": "工作", "estudio": "学习、研究",
+    "tiempo": "时间、天气", "familia": "家庭", "viaje": "旅行", "cambio": "变化",
+    "persona": "人", "lugar": "地方", "forma": "方式", "actividad": "活动",
+    "experiencia": "经历", "resultado": "结果", "pregunta": "问题", "respuesta": "回答",
+    "razón": "理由、道理", "necesario": "必要的", "importante": "重要的",
+    "posible": "可能的", "mejor": "更好的", "difícil": "困难的", "fácil": "容易的",
+    "normal": "正常的", "frecuente": "常见的", "útil": "有用的", "claro": "清楚的",
+    "nuevo": "新的", "primero": "首先、第一", "después": "之后", "antes": "之前",
+    "durante": "在……期间", "siempre": "总是", "nunca": "从不", "también": "也",
+    "aunque": "虽然、即使", "porque": "因为", "cuando": "当……时候", "donde": "在……的地方",
+    "comprar": "购买", "estudiar": "学习", "leer": "阅读", "escribir": "写",
+    "escuchar": "听", "hablar": "说话", "pensar": "思考、认为", "creer": "相信、认为",
+    "decir": "说", "necesitar": "需要", "querer": "想要", "poder": "能够",
+    "hacer": "做", "tener": "有", "estar": "处于、在", "ser": "是", "ir": "去",
+    "volver": "回来、再次",
+}
+
+PHRASE_MEANINGS = {
+    "estar de acuerdo": "同意", "no estar de acuerdo": "不同意",
+    "en mi opinión": "在我看来", "creo que": "我认为", "me parece que": "我觉得",
+    "tener razón": "有道理、是对的", "decir la verdad": "说实话", "exagerar un poco": "稍微夸大",
+    "la calidad de": "……的质量", "me importa": "我在意、对我重要", "a veces": "有时",
+    "es necesario que": "有必要……", "es importante que": "重要的是……",
+    "puede que": "可能……", "me parece normal que": "我觉得……很正常",
+    "te importa que": "你介意……吗", "esperar un poco": "稍等一会儿",
+    "es mejor que": "最好……", "es bueno que": "……是好的",
+    "durante ese período": "在那段时期", "empezar a": "开始做……", "volver a": "重新/再次做……",
+    "acabar de": "刚刚做完……", "dar conferencias": "做讲座", "asistir a": "参加、出席",
+    "publicar un libro": "出版一本书", "terminar una obra": "完成一部作品",
+    "por primera vez": "第一次", "conocer a": "认识某人",
+    "tener la ventaja de": "有……优点", "ser más barato": "更便宜", "ser más cómodo": "更方便",
+    "comparar con": "与……比较", "si tengo tiempo": "如果我有时间", "si es posible": "如果可能",
+    "en caso de": "如果、万一", "depende de": "取决于", "sería mejor": "最好是……",
+    "me gustaría": "我想……", "tener que": "必须、不得不", "hay que": "应该、需要",
+    "para poder": "为了能够……", "quizá": "也许、可能",
+    "tal vez": "也许", "le escribo para": "我写信是为了……",
+    "muchas gracias por": "非常感谢……", "un saludo cordial": "诚挚问候",
+    "adjuntar un documento": "附上一份文件", "también": "也", "por eso": "因此、所以",
+    "por último": "最后", "de esta manera": "这样一来", "aumentar poco a poco": "逐渐增加",
+    "disminuir mucho": "大幅减少", "un cambio importante": "一个重要变化",
+    "cada vez más": "越来越多/越来越……", "cada vez menos": "越来越少",
+    "para explicar mejor": "为了解释得更清楚", "volver a decir": "再说一遍",
+    "ser parecido a": "与……相似", "proponer una solución": "提出一个解决办法",
+    "trabajar juntos": "一起合作",
+}
+
 GRAMMAR_PROMPTS = {
     "subjuntivo": "Recuerda: después de valoración, duda o recomendación suele aparecer subjuntivo: Es importante que practiques.",
     "condicional": "Usa condicional para propuestas diplomáticas: Sería útil revisar este punto antes del examen.",
@@ -461,6 +583,467 @@ def build_grammar_points(topic: dict[str, Any], variant: int = 0) -> list[dict[s
     return rotate_items(GRAMMAR_LIBRARY[grammar_key(topic)], variant)[:1]
 
 
+def chunk_text(chunks: list[dict[str, Any]]) -> str:
+    return " ".join(str(chunk.get("text", "")) for chunk in chunks)
+
+
+def pdf_terms(chunks: list[dict[str, Any]], limit: int = 30) -> list[str]:
+    terms: list[str] = []
+    blocked = {"david", "josé", "jose", "marta", "mariana", "lorca", "garcía", "garcia"}
+    for chunk in chunks:
+        terms.extend(str(term).lower() for term in chunk.get("terms", []))
+        terms.extend(extract_terms(str(chunk.get("text", "")), limit=12))
+    cleaned = [
+        term for term in terms
+        if term not in blocked and (term in B1_MEANINGS or term in VOCAB_MEANINGS or len(term) >= 5)
+    ]
+    return list(dict.fromkeys(cleaned))[:limit]
+
+
+def phrase_candidates(topic: dict[str, Any], chunks: list[dict[str, Any]], variant: int = 0) -> list[str]:
+    text = chunk_text(chunks).lower()
+    pdf_first = [
+        phrase for phrase in B1_PHRASE_BANK.get(topic["title"], [])
+        if phrase.lower() in text or any(part in text for part in phrase.lower().split() if len(part) > 4)
+    ]
+    candidates = list(dict.fromkeys(pdf_first + B1_PHRASE_BANK.get(topic["title"], []) + B2_VOCAB_BANK.get(topic["title"], [])))
+    return rotate_items(candidates, variant * 4)
+
+
+def term_meaning(term: str) -> str:
+    return PHRASE_MEANINGS.get(term) or B1_MEANINGS.get(term) or VOCAB_MEANINGS.get(term) or "与今日 PDF 主题相关的常用词"
+
+
+def natural_example(term: str, topic: dict[str, Any], index: int = 0) -> tuple[str, str]:
+    if term in EXAMPLE_OVERRIDES:
+        return EXAMPLE_OVERRIDES[term]
+    examples = {
+        "estar de acuerdo": ("Estoy de acuerdo con esta opinión porque el ejemplo es claro.", "我同意这个观点，因为例子很清楚。"),
+        "no estar de acuerdo": ("No estoy de acuerdo con la idea principal del texto.", "我不同意文本中的主要观点。"),
+        "en mi opinión": ("En mi opinión, estudiar un poco cada día es más útil.", "在我看来，每天学一点更有用。"),
+        "creo que": ("Creo que este método ayuda a recordar las palabras nuevas.", "我认为这个方法有助于记住新词。"),
+        "me parece que": ("Me parece que la explicación es sencilla y práctica.", "我觉得这个解释简单而实用。"),
+        "tener razón": ("La autora tiene razón cuando dice que necesitamos ejemplos.", "作者说我们需要例子时是有道理的。"),
+        "decir la verdad": ("Es importante decir la verdad en una conversación.", "在对话中说实话很重要。"),
+        "exagerar un poco": ("El anuncio exagera un poco la calidad del producto.", "广告稍微夸大了产品质量。"),
+        "la calidad de": ("La calidad de este producto no siempre depende del precio.", "这个产品的质量并不总是取决于价格。"),
+        "durante ese período": ("Durante ese período, Lorca escribió sus primeras obras.", "在那段时期，洛尔卡写了他的早期作品。"),
+        "empezar a": ("Empecé a leer textos cortos para mejorar mi español.", "我开始读短文来提高西语。"),
+        "volver a": ("Mañana voy a volver a revisar estas palabras.", "明天我要再复习这些词。"),
+        "acabar de": ("Acabo de terminar el ejercicio de lectura.", "我刚刚完成阅读练习。"),
+        "dar conferencias": ("El escritor viajó a otra ciudad para dar conferencias.", "这位作家去另一个城市做讲座。"),
+        "asistir a": ("Muchos estudiantes asistieron a la clase de gramática.", "很多学生参加了语法课。"),
+        "tener que": ("Tengo que repasar las palabras antes de dormir.", "我睡前必须复习单词。"),
+        "hay que": ("Hay que leer el ejemplo antes de hacer el ejercicio.", "做练习前应该先读例句。"),
+        "para poder": ("Leo en voz alta para poder recordar mejor las frases.", "我大声朗读，以便更好地记住句子。"),
+        "si tengo tiempo": ("Si tengo tiempo, repaso cinco palabras antes de dormir.", "如果我有时间，我睡前复习五个单词。"),
+        "si es posible": ("Si es posible, prefiero estudiar con ejemplos del texto.", "如果可能，我更喜欢用课文里的例子学习。"),
+        "en caso de": ("En caso de duda, vuelvo a leer la frase completa.", "如果有疑问，我会重新读完整句子。"),
+        "quizá": ("Quizá el texto parece difícil al principio.", "也许这篇文本一开始看起来有点难。"),
+        "tal vez": ("Tal vez necesito escuchar el audio otra vez.", "也许我需要再听一遍音频。"),
+        "sería mejor": ("Sería mejor escribir frases cortas y claras.", "最好写简短清楚的句子。"),
+        "depende de": ("La respuesta depende de la situación del texto.", "答案取决于文本中的情况。"),
+        "gente": ("Hay mucha gente que vive lejos del centro.", "有很多人住得离市中心很远。"),
+        "personas": ("Muchas personas necesitan más tiempo para descansar.", "很多人需要更多时间休息。"),
+        "tiempo": ("No tengo mucho tiempo, pero puedo leer un párrafo.", "我时间不多，但可以读一段。"),
+        "pisos": ("En las grandes ciudades hay pocos pisos baratos.", "在大城市，便宜的公寓很少。"),
+        "aunque": ("Aunque el texto es largo, las ideas son claras.", "虽然文本很长，但思路很清楚。"),
+        "problema": ("La soledad es un problema importante en algunas ciudades.", "孤独是一些城市里的重要问题。"),
+        "ciudades": ("En las ciudades grandes, la vida puede ser más cara.", "在大城市，生活可能更贵。"),
+        "trabajo": ("Por el trabajo, muchas personas tienen poco tiempo libre.", "由于工作，很多人空闲时间很少。"),
+        "hijos": ("Sus hijos la llaman por teléfono los domingos.", "她的子女星期天给她打电话。"),
+        "ciudad": ("Mi ciudad tiene muchos espacios para estudiar.", "我的城市有很多学习空间。"),
+        "revista": ("Leí una entrevista interesante en una revista.", "我在一本杂志上读到一篇有趣的采访。"),
+        "poemas": ("Los poemas de Lorca son conocidos en muchos países.", "洛尔卡的诗在很多国家都很有名。"),
+        "poeta": ("El poeta escribió sobre la vida de su ciudad.", "这位诗人写了关于他城市生活的内容。"),
+        "grandes": ("Las grandes ciudades tienen problemas diferentes.", "大城市有不同的问题。"),
+        "vivienda": ("La vivienda es cara en muchas ciudades.", "很多城市住房很贵。"),
+        "soledad": ("La soledad afecta a muchas personas mayores.", "孤独影响很多老年人。"),
+        "precio": ("El precio de la vivienda ha subido mucho.", "住房价格上涨了很多。"),
+    }
+    if term in examples:
+        return examples[term]
+    topic_hint = topic["title"].lower()
+    templates = [
+        (f"Podemos usar {term} en una frase sencilla sobre {topic_hint}.", f"我们可以在关于“{topic['title']}”的简单句中使用 {term}。"),
+        (f"Este texto ayuda a entender mejor {term} en contexto.", f"这段文本有助于在语境中更好地理解 {term}。"),
+        (f"Hoy voy a practicar {term} con ejemplos cortos.", f"今天我要用短例句练习 {term}。"),
+    ]
+    return templates[index % len(templates)]
+
+
+def collocation_for(term: str) -> str:
+    collocations = {
+        "estar de acuerdo": "estar de acuerdo con alguien / con una idea",
+        "no estar de acuerdo": "no estar totalmente de acuerdo",
+        "en mi opinión": "en mi opinión + frase completa",
+        "creo que": "creo que + indicativo",
+        "me parece que": "me parece que + indicativo",
+        "es necesario que": "es necesario que + subjuntivo",
+        "es importante que": "es importante que + subjuntivo",
+        "tener que": "tener que + infinitivo",
+        "empezar a": "empezar a + infinitivo",
+        "volver a": "volver a + infinitivo",
+        "acabar de": "acabar de + infinitivo",
+        "asistir a": "asistir a una clase / una reunión",
+        "depender de": "depender de la situación / del tiempo",
+        "por ejemplo": "idea + por ejemplo + caso concreto",
+    }
+    if term in collocations:
+        return collocations[term]
+    if "que" in term:
+        return f"{term} + frase con verbo conjugado"
+    if re.search(r"\bde\b", term):
+        return f"{term} + sustantivo / infinitivo"
+    return f"{term} + ejemplo concreto"
+
+
+def b1_note_for(term: str) -> str:
+    if term in {"creo que", "me parece que", "pienso que"}:
+        return "表达肯定观点时后面通常用陈述式，不要一看到 que 就自动用虚拟式。"
+    if term in {"es necesario que", "es importante que", "dudo que", "no creo que"}:
+        return "que 后面常用虚拟式；先记住固定结构，再慢慢练变位。"
+    if term.endswith(" a") or term in {"asistir a", "empezar a", "volver a"}:
+        return "注意固定介词 a 不要漏掉。"
+    if re.search(r"\bde\b", term):
+        return "注意固定介词 de，不要按中文习惯省略。"
+    return "先会在短句里自然使用，再放进小段落。"
+
+
+def build_required_phrases(topic: dict[str, Any], chunks: list[dict[str, Any]], variant: int = 0) -> list[dict[str, str]]:
+    selected = phrase_candidates(topic, chunks, variant)[:8]
+    entries = []
+    for index, term in enumerate(selected, start=1):
+        example, translation = natural_example(term, topic, index)
+        entries.append(
+            {
+                "term": term,
+                "meaning": term_meaning(term),
+                "usage": vocab_usage(term, topic) if term in VOCAB_MEANINGS else f"适合在“{topic['title']}”相关的阅读、对话或短写作中表达基本意思。",
+                "example": example,
+                "translation": translation,
+                "collocation": collocation_for(term),
+                "note": b1_note_for(term),
+            }
+        )
+    return entries
+
+
+def build_extended_vocab(topic: dict[str, Any], chunks: list[dict[str, Any]], required: list[dict[str, str]], variant: int = 0) -> list[dict[str, str]]:
+    used = {entry["term"] for entry in required}
+    candidates = [term for term in pdf_terms(chunks, 40) + COMMON_B1_VOCAB if term not in used]
+    selected = rotate_items(list(dict.fromkeys(candidates)), variant * 5)[:15]
+    rows = []
+    for index, term in enumerate(selected, start=1):
+        example, translation = natural_example(term, topic, index)
+        rows.append(
+            {
+                "term": term,
+                "meaning": term_meaning(term),
+                "example": example.replace(f"{term}", term, 1),
+                "translation": translation,
+            }
+        )
+    return rows
+
+
+def format_required_phrases(entries: list[dict[str, str]]) -> str:
+    lines = []
+    for index, entry in enumerate(entries, start=1):
+        lines.extend(
+            [
+                f"### 词组 {index}：{entry['term']}",
+                f"【意思】{entry['meaning']}",
+                f"【使用场景】{entry['usage']}",
+                "【例句】",
+                entry["example"],
+                "【翻译】",
+                entry["translation"],
+                f"【常见搭配】{entry['collocation']}",
+                f"【注意】{entry['note']}",
+            ]
+        )
+    return "\n".join(lines)
+
+
+def format_extended_vocab(rows: list[dict[str, str]]) -> str:
+    lines = ["| 西语 | 中文 | 简短例句 | 例句翻译 |", "|---|---|---|---|"]
+    for row in rows:
+        lines.append(f"| {row['term']} | {row['meaning']} | {row['example']} | {row['translation']} |")
+    return "\n".join(lines)
+
+
+def reading_excerpt(chunks: list[dict[str, Any]], topic: dict[str, Any]) -> str:
+    text = clean_excerpt(chunk_text(chunks), max_chars=1300)
+    sentences = [sentence.strip() for sentence in SPANISH_SENTENCE_RE.split(text) if len(SPANISH_WORD_RE.findall(sentence)) >= 4]
+    selected: list[str] = []
+    word_count = 0
+    for sentence in sentences:
+        words = SPANISH_WORD_RE.findall(sentence)
+        if word_count + len(words) > 150 and word_count >= 80:
+            break
+        selected.append(sentence)
+        word_count += len(words)
+        if word_count >= 110:
+            break
+    if selected and word_count >= 45:
+        return " ".join(selected)
+    fallback = (
+        f"El texto de hoy trata sobre {topic['title'].lower()}. Presenta varias ideas y ejemplos que sirven para ampliar "
+        "el vocabulario y practicar frases sencillas. La idea principal no es escribir mucho, sino entender bien las palabras, "
+        "observar cómo se combinan y usar algunas expresiones en oraciones cortas. Así podemos consolidar el nivel B1 y avanzar "
+        "poco a poco hacia una expresión más clara."
+    )
+    return fallback
+
+
+def reading_translation(topic: dict[str, Any], source_pages: str) -> str:
+    return (
+        f"这段来自 PDF 的 {source_pages or '相关页面'}，主题是“{topic['title']}”。"
+        "它主要帮助你理解文本中的常用词、固定搭配和基础句型。学习时不需要追求写很难的句子，"
+        "重点是先看懂原文，再把其中几个表达放进自己的简单句里。"
+    )
+
+
+def build_pdf_reading(topic: dict[str, Any], chunks: list[dict[str, Any]], source_pages: str, required: list[dict[str, str]], extended: list[dict[str, str]]) -> dict[str, Any]:
+    spanish = reading_excerpt(chunks, topic)
+    expressions = [entry["term"] for entry in required[:5]] + [row["term"] for row in extended[:3]]
+    return {
+        "source": f"PDF 参考页：{source_pages or '知识库综合主题'}；如原文过长，已节选为适合 20-30 分钟学习的一小段。",
+        "spanish": spanish,
+        "chinese": reading_translation(topic, source_pages),
+        "expressions": list(dict.fromkeys(expressions))[:8],
+        "summary": f"这段主要围绕“{topic['title']}”展开，适合用来积累词汇、理解句子结构，并做轻量仿写。",
+    }
+
+
+def format_pdf_reading(reading: dict[str, Any]) -> str:
+    expressions = "\n".join(f"- {item}" for item in reading["expressions"])
+    return f"""来源说明：{reading['source']}
+
+【西语原文】
+{reading['spanish']}
+
+【中文翻译】
+{reading['chinese']}
+
+【重点表达】
+{expressions}
+
+【一句话总结】
+{reading['summary']}
+
+【理解问题】
+1. 这段话主要讨论了什么主题？
+2. 从重点表达中选 2 个，说说它们在文中的作用。"""
+
+
+B1_GRAMMAR_POINTS = [
+    {
+        "title": "tener que + infinitivo",
+        "structure": "tener que + 动词原形",
+        "explanation": "表示“必须、不得不”。这是 B1 高频结构，适合写日常计划、学习任务和建议。",
+        "examples": [("Tengo que repasar las palabras nuevas.", "我必须复习新单词。"), ("Tenemos que leer el texto otra vez.", "我们得再读一遍课文。")],
+        "mistake": "tener 要根据主语变位，不要写成 yo tener que。",
+        "practice": ["Yo ______ estudiar todos los días. (tener que)", "把“我们必须读课文”翻译成西语。", "用 tener que 写一句关于学习的句子。"],
+    },
+    {
+        "title": "hay que + infinitivo",
+        "structure": "hay que + 动词原形",
+        "explanation": "表示一般性的“应该、需要”，不强调具体是谁做。",
+        "examples": [("Hay que escuchar el audio dos veces.", "需要听两遍音频。"), ("Hay que escribir frases cortas.", "应该写短句。")],
+        "mistake": "hay que 后面直接接动词原形，不要变位。",
+        "practice": ["Hay que ______ el ejemplo. (leer)", "把“应该复习词组”翻译成西语。", "用 hay que 写一句学习建议。"],
+    },
+    {
+        "title": "porque / como 的基础区别",
+        "structure": "porque 放在原因解释中；como 常放句首，引出原因",
+        "explanation": "porque 回答“为什么”；como 放在句首时，先说明原因，再说结果。",
+        "examples": [("No salgo porque tengo que estudiar.", "我不出门，因为我得学习。"), ("Como tengo poco tiempo, leo un texto corto.", "因为我时间少，所以读一篇短文。")],
+        "mistake": "como 表原因时通常放句首；不要把所有“因为”都机械写成 porque。",
+        "practice": ["No compro este producto ______ es caro.", "______ necesito practicar, escribo tres frases.", "用 porque 写一句关于今天词汇的句子。"],
+    },
+    {
+        "title": "antes de / después de + infinitivo",
+        "structure": "antes de / después de + 动词原形",
+        "explanation": "用来表达两个动作的先后顺序，适合讲学习流程。",
+        "examples": [("Antes de escribir, leo el ejemplo.", "写之前，我读例句。"), ("Después de estudiar, hago un pequeño test.", "学习之后，我做一个小测试。")],
+        "mistake": "de 不要漏掉；后面接动词原形，不要变位。",
+        "practice": ["Antes de ______, reviso las palabras. (escribir)", "把“学习之后我做练习”翻译成西语。", "用 después de 写一句自己的学习习惯。"],
+    },
+    {
+        "title": "aunque + indicativo",
+        "structure": "aunque + 陈述式",
+        "explanation": "当你说的是已知事实或真实情况时，aunque 后面可以用陈述式，表示“虽然”。",
+        "examples": [("Aunque el texto es corto, tiene palabras útiles.", "虽然文本很短，但有有用的词。"), ("Aunque la gramática parece difícil, el ejemplo es claro.", "虽然语法看起来难，但例子很清楚。")],
+        "mistake": "当前阶段先掌握 aunque + indicativo，不要急着大量使用虚拟式。",
+        "practice": ["Aunque el ejercicio ______ fácil, necesito practicar. (ser)", "把“虽然句子很短，但很有用”翻译成西语。", "用 aunque 写一句关于今天阅读的句子。"],
+    },
+]
+
+
+def build_b1_grammar(topic: dict[str, Any], variant: int = 0) -> dict[str, Any]:
+    key = grammar_key(topic)
+    offset = {"conectores": 2, "subjuntivo": 4, "narración": 3, "condicional": 0}.get(key, 0)
+    return B1_GRAMMAR_POINTS[(variant + offset) % len(B1_GRAMMAR_POINTS)]
+
+
+def format_b1_grammar(point: dict[str, Any]) -> str:
+    practice = "\n".join(f"{index}. {item}" for index, item in enumerate(point["practice"], start=1))
+    example_1, translation_1 = point["examples"][0]
+    example_2, translation_2 = point["examples"][1]
+    return f"""【今日语法】{point['title']}
+
+【结构】{point['structure']}
+【中文解释】{point['explanation']}
+【例句 1】
+{example_1}
+{translation_1}
+【例句 2】
+{example_2}
+{translation_2}
+【常见错误】{point['mistake']}
+【小练习】
+{practice}"""
+
+
+def build_light_output(required: list[dict[str, str]], grammar: dict[str, Any], topic: dict[str, Any]) -> str:
+    p1, p2, p3, p4, p5 = [entry["term"] for entry in required[:5]]
+    return f"""### 第一层：控制练习
+
+【填空 1】No estoy ______ acuerdo con esta idea. (de / con)
+【填空 2】Antes de ______, leo el ejemplo. (escribir)
+【填空 3】Hay que ______ las palabras nuevas. (repasar)
+
+【中译西 1】我认为这个例子很清楚。
+【中译西 2】我必须复习今天的词组。
+【中译西 3】虽然文本很短，但是很有用。
+
+### 第二层：仿写练习
+
+【仿写 1】框架：En mi opinión, ...
+提示：用 “{p1}” 或 “{p2}” 写一个简单观点句。
+
+【仿写 2】框架：Tengo que ... antes de ...
+提示：写一个自己的学习习惯。
+
+【仿写 3】框架：Aunque ..., ...
+提示：用今天的阅读主题写一句让步句。
+
+### 第三层：小段输出
+
+【写作任务】围绕“{topic['title']}”写 50-80 词的小段落。不要写长作文，目标是把今天词汇用稳。
+
+【写作框架】
+1. En mi opinión, ...
+2. Por ejemplo, ...
+3. Aunque ..., ...
+4. Por eso, tengo que ...
+
+【要求】至少使用 5 个今日词汇或词组：{p1}、{p2}、{p3}、{p4}、{p5}。"""
+
+
+def build_b1_quiz(required: list[dict[str, str]], extended: list[dict[str, str]], grammar: dict[str, Any]) -> str:
+    first = required[0]
+    second = required[1]
+    vocab = extended[0]
+    return f"""1. 词汇选择：{first['term']} 的意思最接近：A. {first['meaning']} B. 完全相反 C. 专业术语
+2. 词汇选择：{vocab['term']} 的中文意思是：A. {vocab['meaning']} B. 不知道 C. 与今天主题无关
+3. 语法填空：{grammar['practice'][0]}
+4. 中译西：我认为这个文本很有用。
+5. 句型转换：把 “Leo el ejemplo. Después escribo una frase.” 改成 “Después de ...”。
+6. 阅读理解：今天 PDF 精读段落的主要主题是什么？"""
+
+
+def build_b1_answers(required: list[dict[str, str]], extended: list[dict[str, str]], grammar: dict[str, Any]) -> str:
+    return f"""### 轻量输出训练参考答案
+
+【答案 1】de
+【解析】固定搭配是 estar de acuerdo。常见错误是漏掉 de。
+
+【答案 2】escribir
+【解析】antes de 后面接动词原形。记住 antes de + infinitivo。
+
+【答案 3】repasar
+【解析】hay que 后面接动词原形，不要写成 repasas。
+
+【答案 4】Creo que este ejemplo es claro.
+【解析】creo que 表达肯定观点，后面先用陈述式。记住 creo que + indicativo。
+
+【答案 5】Tengo que repasar los grupos de palabras de hoy.
+【解析】tener que + infinitivo 表示“必须”。tener 要按主语变位。
+
+【答案 6】Aunque el texto es corto, es muy útil.
+【解析】这里说的是事实，可以先用 aunque + indicativo。
+
+### 今日小测试参考答案
+
+【答案 1】A. {required[0]['meaning']}
+【解析】{required[0]['term']} 是今天必背词组，要能从中文意思反推西语。
+
+【答案 2】A. {extended[0]['meaning']}
+【解析】扩展词汇不需要长篇背诵，但要能在例句里认出来。
+
+【答案 3】参考语法小练习答案
+【解析】今天语法点是 {grammar['title']}；做题时先看结构：{grammar['structure']}。
+
+【答案 4】Creo que este texto es muy útil.
+【解析】B1 阶段先把 creo que + 简单句写稳。
+
+【答案 5】Después de leer el ejemplo, escribo una frase.
+【解析】después de 后面接 infinitivo。常见错误是把 leer 变位。
+
+【答案 6】答案可用中文概括：围绕今天 PDF 主题，理解常用词组、句型和文本意思。
+【解析】阅读题重点不是猜难词，而是抓主题和高频表达。"""
+
+
+def build_b1_spaced_review(plan: list[dict[str, Any]], current_day: int, today: date) -> str:
+    def past_material(day_number: int) -> tuple[dict[str, Any], int]:
+        topic = topic_for_lesson(plan, day_number)
+        return topic, variant_for_lesson(day_number, len(plan))
+
+    lines = []
+    tasks = []
+    if current_day > 1:
+        target_day = current_day - 1
+        topic, variant = past_material(target_day)
+        phrases = build_required_phrases(topic, [], variant)[:5]
+        lines.append(f"### 昨天的 5 个词组（Día {target_day}）")
+        lines.extend(f"- {entry['term']}：{entry['meaning']}" for entry in phrases)
+        tasks.append(f"1. 从昨天词组里选 2 个，各写一个短句。")
+    else:
+        lines.append("### 昨天的 5 个词组")
+        lines.append("- 今天是第 1 天，还没有昨天内容；明天开始自动复习。")
+
+    if current_day > 3:
+        target_day = current_day - 3
+        topic, variant = past_material(target_day)
+        vocab = build_extended_vocab(topic, [], [], variant)[:5]
+        lines.append(f"\n### 3 天前的 5 个词汇（Día {target_day}）")
+        lines.extend(f"- {row['term']}：{row['meaning']}" for row in vocab)
+        tasks.append("2. 从 3 天前词汇里选 2 个，口头造句。")
+    else:
+        lines.append("\n### 3 天前的 5 个词汇")
+        lines.append("- 历史天数还不够，暂时跳过。")
+
+    if current_day > 7:
+        target_day = current_day - 7
+        topic, variant = past_material(target_day)
+        grammar = build_b1_grammar(topic, variant)
+        lines.append(f"\n### 7 天前的 1 个语法点（Día {target_day}）")
+        lines.append(f"- {grammar['title']}：{grammar['structure']}")
+        tasks.append("3. 用 7 天前语法点写 1 个句子。")
+    else:
+        lines.append("\n### 7 天前的 1 个语法点")
+        lines.append("- 历史天数还不够，暂时跳过。")
+
+    if not tasks:
+        tasks = ["1. 从今天内容中选 3 个最想记住的词，读两遍。"]
+    lines.append("\n【复习小题】")
+    lines.extend(tasks[:5])
+    return "\n".join(lines)
+
+
 def build_reading(topic: dict[str, Any], source_pages: str) -> dict[str, Any]:
     title = topic["title"]
     if "Subjuntivo" in title:
@@ -599,7 +1182,7 @@ def build_half_open_output(vocab_entries: list[dict[str, str]], patterns: list[d
 def build_dele_output(topic: dict[str, Any], patterns: list[dict[str, str]]) -> str:
     return f"""### 第三层：小输出
 
-【写作任务】围绕“{topic['title']}”写 60-80 词。不要写长作文，只写一个清楚段落。
+【写作任务】围绕“{topic['title']}”写 50-80 词。不要写长作文，只写一个清楚段落。
 
 【写作框架】
 1. Para empezar, creo que ...
@@ -761,7 +1344,7 @@ def add_new_review_cards(cards: list[dict[str, Any]], today: date, topic: dict[s
             {
                 "id": card_id,
                 "front": item,
-                "back": f"用这个表达围绕“{topic['title']}”造一句 DELE B2 风格的句子。",
+                "back": f"用这个表达围绕“{topic['title']}”造一句 B1+ 风格的句子。",
                 "created_at": today.isoformat(),
                 "due_date": (today + timedelta(days=1)).isoformat(),
                 "review_count": 0,
@@ -772,79 +1355,60 @@ def add_new_review_cards(cards: list[dict[str, Any]], today: date, topic: dict[s
 
 
 def build_lesson(knowledge: dict[str, Any], day_number: int, today: date, cards_path: Path) -> dict[str, str]:
+    _ = cards_path
     plan = knowledge["course_plan"]
     topic = topic_for_lesson(plan, day_number)
     variant = variant_for_lesson(day_number, len(plan))
-    chunks = select_chunks(knowledge, topic, variant=variant)
-    source_terms = []
-    for chunk in chunks:
-        source_terms.extend(extract_terms(chunk["text"], limit=6))
-    vocab_entries = build_vocab_entries(topic, source_terms, variant)
-    sentence_patterns = build_sentence_patterns(topic, variant)
-    grammar_points = build_grammar_points(topic, variant)
+    chunks = select_chunks(knowledge, topic, limit=4, variant=variant)
+    required_phrases = build_required_phrases(topic, chunks, variant)
+    extended_vocab = build_extended_vocab(topic, chunks, required_phrases, variant)
+    grammar_point = build_b1_grammar(topic, variant)
 
     source_pages = ", ".join(
         f"p.{chunk['page_start']}" if chunk["page_start"] == chunk["page_end"] else f"p.{chunk['page_start']}-{chunk['page_end']}"
         for chunk in chunks
     )
-    reading = build_reading(topic, source_pages)
-    review_block = build_spaced_review(plan, day_number, today)
-    if day_number == 1:
-        due_note = "- 今天是课程第 1 天，先建立输入和输出节奏；从明天开始自动加入间隔复习。"
-    else:
-        due_note = "- 今天会复习昨天的 2 个词组；到第 4 天加入 3 天前句型，到第 8 天加入 7 天前语法点。"
+    reading = build_pdf_reading(topic, chunks, source_pages, required_phrases, extended_vocab)
+    review_block = build_b1_spaced_review(plan, day_number, today)
 
-    markdown = f"""# DELE B2 每日学习 - Día {day_number} - {today.isoformat()}
+    markdown = f"""# 西语 B1 巩固与 B2 过渡 - Día {day_number}
 
-## 今日学习目标
-【今日主题】{topic['title']}
+## 今日目标
+【具体目标】今天掌握 8 个与“{topic['title']}”相关的常用词组，并能用其中 5 个写出简单句子。
 
-【具体目标】今天掌握 {len(vocab_entries)} 个围绕“{topic['title']}”表达观点的核心表达，并能用它们完成 2 个短句和 1 个 60-80 词小段落。
+【学习定位】以 PDF 的 B1 内容为主，先积累词汇和固定搭配，再做少量 B1+ 输出。
 
-【预计用时】20-30 分钟。先理解，再练习，最后小输出。
+【预计用时】20-30 分钟。输入约 70%，输出约 30%。
 
-【B2 小目标】{topic['b2_goal']}
+【PDF 来源】{source_pages or '知识库综合复习'}
 
-【材料来源】{source_pages or '知识库综合复习'}
+## 今日必背词组：8 个
+{format_required_phrases(required_phrases)}
 
-【额外到期复习卡】
-{due_note}
+## 今日扩展词汇：10-15 个
+{format_extended_vocab(extended_vocab)}
 
-## 输入部分：先理解
+## PDF 精读：1 段
+{format_pdf_reading(reading)}
 
-## 核心词汇与词组（6-8 个）
-{format_vocab(vocab_entries)}
+## 今日语法小点：1 个
+{format_b1_grammar(grammar_point)}
 
-## 高频句型（2-3 个）
-{format_patterns(sentence_patterns)}
-
-## 语法重点（1 个）
-{format_grammar(grammar_points)}
-
-## 精读段落（1 段）
-{format_reading(reading)}
-
-## 输出部分：再练习
-
-## 分级输出练习
-{build_controlled_practice(vocab_entries, sentence_patterns)}
-
-{build_half_open_output(vocab_entries, sentence_patterns)}
-
-{build_dele_output(topic, sentence_patterns)}
-
-## 今日小测试（5-6 题）
-{build_quiz(vocab_entries, sentence_patterns)}
-
-## 答案与解析
-{build_answers(vocab_entries)}
+## 轻量输出训练
+{build_light_output(required_phrases, grammar_point, topic)}
 
 ## 间隔复习
 {review_block}
+
+## 今日小测试（5-6 题）
+{build_b1_quiz(required_phrases, extended_vocab, grammar_point)}
+
+## 答案与解析
+{build_b1_answers(required_phrases, extended_vocab, grammar_point)}
 """
 
     html_body = markdown_to_html(markdown)
-    return {"markdown": markdown, "html": html_body, "subject": f"DELE B2 每日学习 Día {day_number} - {topic['title']}"}
+    return {"markdown": markdown, "html": html_body, "subject": f"西语 B1 巩固与 B2 过渡 Día {day_number} - {topic['title']}"}
 
 
 def markdown_to_html(markdown: str) -> str:
@@ -884,7 +1448,7 @@ def markdown_to_html(markdown: str) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate today's DELE B2 lesson.")
+    parser = argparse.ArgumentParser(description="Generate today's B1 consolidation and B2 bridge lesson.")
     parser.add_argument("--knowledge", type=Path, default=DEFAULT_KNOWLEDGE_BASE)
     parser.add_argument("--output-dir", type=Path, default=DAILY_OUTPUT_DIR)
     parser.add_argument("--progress", type=Path, default=DEFAULT_PROGRESS)
