@@ -328,7 +328,7 @@ def add_markdown_table(document: Document, table_lines: list[str]) -> None:
 def markdown_to_docx(markdown: str, output_path: Path) -> None:
     document = Document()
     configure_document(document)
-    next_example_style: str | None = None
+    active_example_style: str | None = None
 
     lines = markdown.splitlines()
     index = 0
@@ -346,24 +346,32 @@ def markdown_to_docx(markdown: str, output_path: Path) -> None:
             add_markdown_table(document, table_lines)
             continue
         if line.startswith("# "):
+            active_example_style = None
             add_title(document, line[2:])
             continue
         if line.startswith("## "):
+            active_example_style = None
             add_heading_one(document, line[3:])
             continue
         if line.startswith("### "):
+            active_example_style = None
             add_heading_two(document, line[4:])
             continue
         if line in {"西语：", "中文：", "西语原文：", "中文翻译："}:
             add_example_label(document, line)
-            next_example_style = "chinese" if line.startswith("中文") else "spanish"
+            active_example_style = "chinese" if line.startswith("中文") else "spanish"
             continue
         if line.startswith("【"):
             add_label_paragraph(document, line)
+            if line.startswith(("【西语原文】", "【例句】")):
+                active_example_style = "spanish"
+            elif line.startswith(("【中文翻译】", "【翻译】")):
+                active_example_style = "chinese"
+            else:
+                active_example_style = None
             continue
-        if next_example_style:
-            add_example_text(document, line, chinese=next_example_style == "chinese")
-            next_example_style = None
+        if active_example_style:
+            add_example_text(document, line, chinese=active_example_style == "chinese")
             continue
         if line.startswith("- "):
             add_list_paragraph(document, line[2:], numbered=False)

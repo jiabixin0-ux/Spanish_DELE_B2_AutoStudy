@@ -6,7 +6,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from dele_b2_auto_study.generate_daily import build_lesson, choose_lesson_day
+from dele_b2_auto_study.generate_daily import build_lesson, build_pdf_reading, choose_lesson_day
 from dele_b2_auto_study.split_knowledge import build_knowledge_base, classify_chunk, extract_terms
 
 
@@ -93,6 +93,24 @@ class DailyLessonTests(unittest.TestCase):
                 "间隔复习",
             ):
                 self.assertIn(section, markdown)
+
+    def test_pdf_reading_translation_matches_sentences(self) -> None:
+        topic = {"title": "Conectores para organizar argumentos"}
+        chunks = [
+            {
+                "text": (
+                    "Aunque el tema parece sencillo, conviene argumentar con ejemplos concretos. "
+                    "El texto propone comparar ventajas e inconvenientes y expresar una opinión matizada."
+                )
+            }
+        ]
+        reading = build_pdf_reading(topic, chunks, "p.1", [], [])
+        self.assertEqual(len(reading["spanish_sentences"]), len(reading["chinese_sentences"]))
+        self.assertIn("虽然这个话题看起来简单", reading["chinese_sentences"][0])
+        self.assertNotIn("这段来自 PDF", "\n".join(reading["chinese_sentences"]))
+        spanish = " ".join(reading["spanish_sentences"]).lower()
+        for term, _ in reading["expressions"]:
+            self.assertIn(term.lower(), spanish)
 
     def test_spaced_review_is_generated_from_dates_without_cards_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

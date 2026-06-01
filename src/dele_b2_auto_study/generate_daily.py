@@ -173,7 +173,11 @@ B1_MEANINGS = {
     "escuchar": "听", "hablar": "说话", "pensar": "思考、认为", "creer": "相信、认为",
     "decir": "说", "necesitar": "需要", "querer": "想要", "poder": "能够",
     "hacer": "做", "tener": "有", "estar": "处于、在", "ser": "是", "ir": "去",
-    "volver": "回来、再次",
+    "volver": "回来、再次", "arroba": "at 符号，@", "símbolo": "符号", "origen": "起源",
+    "internet": "互联网", "correo electrónico": "电子邮件", "direcciones": "地址",
+    "círculo": "圆圈", "edad media": "中世纪", "copiar libros": "抄写书籍",
+    "páginas": "页面", "documentos": "文件、文献", "carta": "信件",
+    "mercader": "商人", "sevilla": "塞维利亚", "roma": "罗马",
 }
 
 PHRASE_MEANINGS = {
@@ -773,59 +777,287 @@ def format_extended_vocab(rows: list[dict[str, str]]) -> str:
     return "\n".join(lines)
 
 
-def reading_excerpt(chunks: list[dict[str, Any]], topic: dict[str, Any]) -> str:
-    text = clean_excerpt(chunk_text(chunks), max_chars=1300)
-    sentences = [sentence.strip() for sentence in SPANISH_SENTENCE_RE.split(text) if len(SPANISH_WORD_RE.findall(sentence)) >= 4]
+READING_INSTRUCTION_MARKERS = (
+    "instrucciones", "hoja de respuestas", "marque las opciones", "hay dos fragmentos",
+    "lea el siguiente", "a continuación lea", "opciones elegidas", "no tiene que elegir",
+)
+
+READING_EXPRESSION_MEANINGS = {
+    "estar de acuerdo": "同意",
+    "en mi opinión": "在我看来",
+    "creo que": "我认为",
+    "aunque": "虽然",
+    "por ejemplo": "例如",
+    "es necesario": "有必要",
+    "puede que": "可能",
+    "tener que": "必须、不得不",
+    "antes de": "在……之前",
+    "después de": "在……之后",
+    "por primera vez": "第一次",
+    "por un lado": "一方面",
+    "por otro lado": "另一方面",
+    "en cambio": "相反、然而",
+    "depender de": "取决于",
+    "si es posible": "如果可能",
+    "en caso de": "如果、万一",
+    "tal vez": "也许",
+    "quizá": "也许",
+    "correo electrónico": "电子邮件",
+    "direcciones de correo electrónico": "电子邮件地址",
+    "correo formal": "正式邮件",
+    "pedir información": "询问信息",
+    "con respeto": "礼貌地、带着尊重",
+    "motivo del mensaje": "邮件的原因",
+    "frases claras": "清楚的句子",
+    "adjuntar un documento": "附上一份文件",
+    "justificar su solicitud": "说明自己的请求",
+    "al final": "最后",
+    "queda a la espera": "等待回复",
+    "arroba": "@ 符号",
+    "símbolo": "符号",
+    "origen": "起源",
+    "edad media": "中世纪",
+    "copiar libros": "抄写书籍",
+    "ahorrar trabajo": "节省工作量",
+    "cientos de páginas": "数百页",
+    "una carta enviada": "一封寄出的信",
+    "me dirijo a usted": "我写信给您",
+    "quisiera solicitar": "我想申请/请求",
+    "quedo a la espera": "等待您的回复",
+    "en primer lugar": "首先",
+    "además": "此外",
+    "sin embargo": "然而",
+    "en resumen": "总之",
+    "la mayoría de": "大多数",
+    "según los datos": "根据数据",
+    "a lo largo de": "在……过程中",
+    "cada vez más": "越来越多",
+    "es decir": "也就是说",
+    "dicho de otro modo": "换句话说",
+    "hacer referencia a": "指的是",
+    "tomar medidas": "采取措施",
+    "hacer frente a": "面对、应对",
+    "buscar una alternativa": "寻找替代方案",
+}
+
+EXACT_READING_TRANSLATIONS = {
+    "aunque el tema parece sencillo, conviene argumentar con ejemplos concretos.": "虽然这个话题看起来简单，但最好用具体例子来论证。",
+    "el texto propone comparar ventajas e inconvenientes y expresar una opinión matizada.": "这篇文本建议比较优点和缺点，并表达一个更细致的观点。",
+    "es posible que usted crea que la arroba es un invento propio de la era internet, un símbolo creado para dar forma a las direcciones de correo electrónico.": "您可能认为 arroba（@）是互联网时代特有的发明，是为了构成电子邮件地址而创造的符号。",
+    "sin embargo, su origen es mucho más antiguo.": "然而，它的起源要古老得多。",
+    "en cuanto al símbolo @, esa especie de a encerrada en un círculo, se sabe que tiene sus orígenes en la edad media, y que era utilizado por los encargados de copiar libros en latín, por supuesto a mano.": "至于 @ 这个符号，也就是那种被圆圈围住的字母 a，人们知道它起源于中世纪，当时由负责手工抄写拉丁文书籍的人使用。",
+    "parece lógico que fuera una forma de ahorrar trabajo cuando se tenían que escribir decenas de veces cientos de páginas.": "当人们不得不几十次地书写数百页内容时，用这种方式节省工作量似乎很合理。",
+    "uno de los documentos más antiguos en el que aparece el símbolo @ es una carta enviada desde sevilla a roma por un mercader italiano en 1536.": "出现 @ 符号的最古老文献之一，是一封 1536 年由一位意大利商人从塞维利亚寄往罗马的信。",
+}
+
+TOPIC_READING_LIBRARY = {
+    "Opinar y matizar en temas cotidianos": [
+        ("En el texto de la unidad, varias personas dan su opinión sobre un producto que usan todos los días.", "在本单元的文本中，几个人谈论他们每天使用的一种产品。"),
+        ("Una persona está de acuerdo con la publicidad porque cree que la calidad es buena.", "一个人同意广告里的说法，因为他认为质量很好。"),
+        ("Otra persona no está de acuerdo y dice que la marca exagera un poco.", "另一个人不同意，并说这个品牌有一点夸大。"),
+        ("El texto muestra que, para opinar bien, hay que explicar la razón y dar un ejemplo concreto.", "这篇文本说明，为了更好地表达观点，需要解释理由并给出一个具体例子。"),
+    ],
+    "Subjuntivo para valoración y duda": [
+        ("El texto presenta una situación en la que una persona tiene que tomar una decisión importante.", "这篇文本呈现了一个人必须做出重要决定的情境。"),
+        ("Algunos compañeros creen que es necesario esperar un poco antes de responder.", "一些同伴认为，在回复之前有必要稍等一下。"),
+        ("Otros piensan que puede que la solución sea más fácil de lo que parece.", "另一些人认为，解决办法可能比看起来更简单。"),
+        ("La unidad ayuda a expresar duda, valoración y necesidad con frases cortas y claras.", "这一单元帮助学习者用简短清楚的句子表达怀疑、评价和需要。"),
+    ],
+    "Narrar experiencias y cambios": [
+        ("El texto habla de una persona que recuerda una etapa importante de su vida.", "这篇文本讲述了一个人回忆自己人生中的一个重要阶段。"),
+        ("Durante ese período, empezó a estudiar más y volvió a escribir con frecuencia.", "在那段时期，他开始更努力地学习，并重新经常写作。"),
+        ("Después de conocer a otras personas, cambió poco a poco su manera de trabajar.", "认识其他人之后，他一点一点改变了自己的工作方式。"),
+        ("La experiencia muestra que los cambios personales suelen llegar con tiempo y práctica.", "这段经历说明，个人变化通常会随着时间和练习慢慢到来。"),
+    ],
+    "Contrastar ventajas e inconvenientes": [
+        ("El texto compara dos formas de vivir en la ciudad y presenta sus ventajas e inconvenientes.", "这篇文本比较了两种城市生活方式，并呈现它们的优点和缺点。"),
+        ("Por un lado, vivir cerca del centro puede ser más cómodo para ir al trabajo.", "一方面，住在市中心附近去上班可能更方便。"),
+        ("Por otro lado, el precio de la vivienda suele ser más alto y hay más ruido.", "另一方面，住房价格通常更高，而且噪音更多。"),
+        ("La conclusión es que la mejor opción depende de las necesidades de cada persona.", "结论是，最好的选择取决于每个人的需要。"),
+    ],
+    "Expresar hipótesis y condiciones": [
+        ("El texto plantea una situación en la que una persona debe organizar su tiempo de estudio.", "这篇文本提出了一个人必须安排自己学习时间的情境。"),
+        ("Si tiene tiempo por la tarde, puede repasar las palabras nuevas y leer un texto breve.", "如果他下午有时间，可以复习新单词并读一篇短文。"),
+        ("En caso de tener mucho trabajo, sería mejor hacer solo una actividad pequeña.", "如果工作很多，最好只做一个小活动。"),
+        ("La idea principal es adaptar el plan a las condiciones reales de cada día.", "主要意思是要根据每天的真实情况调整计划。"),
+    ],
+    "Escribir correos formales": [
+        ("El texto de la unidad muestra cómo escribir un correo formal para pedir información.", "本单元的文本展示了如何写一封正式邮件来询问信息。"),
+        ("La persona saluda con respeto, explica el motivo del mensaje y usa frases claras.", "写信人礼貌地问候，说明邮件的原因，并使用清楚的句子。"),
+        ("También puede adjuntar un documento si necesita justificar su solicitud.", "如果需要说明自己的请求，也可以附上一份文件。"),
+        ("Al final, agradece la ayuda y queda a la espera de una respuesta.", "最后，写信人感谢对方的帮助，并等待回复。"),
+    ],
+    "Conectores para organizar argumentos": [
+        ("El texto explica cómo ordenar las ideas cuando queremos defender una opinión.", "这篇文本解释了当我们想维护一个观点时，如何组织想法。"),
+        ("En primer lugar, conviene presentar la idea principal con una frase sencilla.", "首先，最好用一个简单的句子提出主要观点。"),
+        ("Después, podemos añadir un ejemplo o una razón para que el argumento sea más claro.", "然后，我们可以补充一个例子或一个理由，让论点更清楚。"),
+        ("En resumen, los conectores ayudan a unir las frases y a mostrar la relación entre ellas.", "总之，连接词帮助连接句子，并显示句子之间的关系。"),
+    ],
+    "Describir datos, tendencias y cambios sociales": [
+        ("El texto presenta datos sobre un cambio social que afecta a muchas personas.", "这篇文本呈现了一个影响许多人的社会变化的数据。"),
+        ("Según los datos, la mayoría de los jóvenes usa internet todos los días.", "根据数据，大多数年轻人每天使用互联网。"),
+        ("A lo largo de los últimos años, este uso ha aumentado poco a poco.", "在过去几年里，这种使用情况逐渐增加。"),
+        ("El texto invita a observar las cifras y explicar los cambios con palabras sencillas.", "这篇文本提醒我们观察数字，并用简单的词解释变化。"),
+    ],
+    "Reformular y evitar repeticiones": [
+        ("El texto enseña a explicar una misma idea con palabras diferentes.", "这篇文本教学习者用不同的词解释同一个想法。"),
+        ("Es decir, no siempre tenemos que repetir exactamente la misma frase.", "也就是说，我们不一定总是重复完全相同的句子。"),
+        ("Dicho de otro modo, reformular ayuda a que el discurso sea más claro y natural.", "换句话说，改述能帮助表达更清楚、更自然。"),
+        ("Esta estrategia es útil cuando queremos resumir una opinión o aclarar un ejemplo.", "当我们想总结一个观点或解释一个例子时，这个策略很有用。"),
+    ],
+    "Debatir soluciones y propuestas": [
+        ("El texto presenta un problema cotidiano y varias propuestas para mejorar la situación.", "这篇文本提出了一个日常问题，以及几个改善情况的建议。"),
+        ("Una persona propone tomar medidas pequeñas, pero constantes, durante la semana.", "一个人建议在一周内采取小而持续的措施。"),
+        ("Otra persona cree que es necesario buscar una alternativa más práctica.", "另一个人认为有必要寻找一个更实用的替代方案。"),
+        ("La unidad muestra que una buena propuesta debe ser clara, realista y fácil de aplicar.", "这一单元说明，一个好的建议应该清楚、现实，并且容易执行。"),
+    ],
+}
+
+
+def normalize_reading_sentence(sentence: str) -> str:
+    sentence = re.sub(r"\s+([,.;:!?])", r"\1", sentence)
+    sentence = re.sub(r"\s+", " ", sentence).strip()
+    return sentence
+
+
+def translation_key(sentence: str) -> str:
+    return normalize_reading_sentence(sentence).lower()
+
+
+def term_in_spanish_text(term: str, spanish: str) -> bool:
+    letters = "A-Za-zÁÉÍÓÚÜÑáéíóúüñ"
+    pattern = rf"(?<![{letters}]){re.escape(term.lower())}(?![{letters}])"
+    return re.search(pattern, spanish.lower()) is not None
+
+
+def strip_reading_header(sentence: str) -> str:
+    sentence = normalize_reading_sentence(sentence)
+    sentence = re.sub(r"^B1\s*\)?\s*\d+\s*\*?\s*", "", sentence, flags=re.IGNORECASE)
+    sentence = re.sub(
+        r"^[A-ZÁÉÍÓÚÜÑ0-9@() /-]{8,}\s+(?=(Es|Sin|En|Parece|Uno|Una|El|La|Los|Las)\b)",
+        "",
+        sentence,
+    )
+    return normalize_reading_sentence(sentence)
+
+
+def is_instruction_sentence(sentence: str) -> bool:
+    lower = sentence.lower()
+    if any(marker in lower for marker in READING_INSTRUCTION_MARKERS):
+        return True
+    if re.search(r"\b(tarea|instrucciones|respuestas)\b", lower):
+        return True
+    words = SPANISH_WORD_RE.findall(sentence)
+    return len(words) < 6 or len(words) > 45
+
+
+def reading_sentences_from_chunks(chunks: list[dict[str, Any]]) -> list[str]:
+    text = clean_excerpt(chunk_text(chunks), max_chars=1800)
+    candidates = [strip_reading_header(sentence) for sentence in SPANISH_SENTENCE_RE.split(text)]
     selected: list[str] = []
     word_count = 0
-    for sentence in sentences:
+    for sentence in candidates:
+        if is_instruction_sentence(sentence):
+            continue
         words = SPANISH_WORD_RE.findall(sentence)
-        if word_count + len(words) > 150 and word_count >= 80:
+        if word_count + len(words) > 150 and word_count >= 70:
             break
         selected.append(sentence)
         word_count += len(words)
-        if word_count >= 110:
+        if word_count >= 95 and len(selected) >= 3:
             break
-    if selected and word_count >= 45:
-        return " ".join(selected)
-    fallback = (
-        f"El texto de hoy trata sobre {topic['title'].lower()}. Presenta varias ideas y ejemplos que sirven para ampliar "
-        "el vocabulario y practicar frases sencillas. La idea principal no es escribir mucho, sino entender bien las palabras, "
-        "observar cómo se combinan y usar algunas expresiones en oraciones cortas. Así podemos consolidar el nivel B1 y avanzar "
-        "poco a poco hacia una expresión más clara."
-    )
-    return fallback
+    if word_count >= 45:
+        return selected
+    if len(selected) >= 2 and translate_reading_sentences(selected):
+        return selected
+    return []
 
 
-def reading_translation(topic: dict[str, Any], source_pages: str) -> str:
-    return (
-        f"这段来自 PDF 的 {source_pages or '相关页面'}，主题是“{topic['title']}”。"
-        "它主要帮助你理解文本中的常用词、固定搭配和基础句型。学习时不需要追求写很难的句子，"
-        "重点是先看懂原文，再把其中几个表达放进自己的简单句里。"
-    )
+def translate_reading_sentences(sentences: list[str]) -> list[str] | None:
+    translations: list[str] = []
+    for sentence in sentences:
+        translated = EXACT_READING_TRANSLATIONS.get(translation_key(sentence))
+        if translated is None:
+            return None
+        translations.append(translated)
+    return translations
+
+
+def fallback_reading_sentences(topic: dict[str, Any]) -> tuple[list[str], list[str]]:
+    pairs = TOPIC_READING_LIBRARY.get(topic["title"]) or TOPIC_READING_LIBRARY["Conectores para organizar argumentos"]
+    return [spanish for spanish, _ in pairs], [chinese for _, chinese in pairs]
+
+
+def reading_expressions(spanish_sentences: list[str], required: list[dict[str, str]], extended: list[dict[str, str]]) -> list[tuple[str, str]]:
+    spanish = " ".join(spanish_sentences).lower()
+    candidates = [entry["term"] for entry in required] + [row["term"] for row in extended] + list(READING_EXPRESSION_MEANINGS)
+    expressions: list[tuple[str, str]] = []
+    for term in dict.fromkeys(candidates):
+        if term_in_spanish_text(term, spanish):
+            expressions.append((term, READING_EXPRESSION_MEANINGS.get(term) or term_meaning(term)))
+        if len(expressions) >= 8:
+            break
+    if len(expressions) < 5:
+        for term in extract_terms(" ".join(spanish_sentences), limit=12):
+            if term_in_spanish_text(term, spanish) and term not in {item[0] for item in expressions}:
+                expressions.append((term, term_meaning(term)))
+            if len(expressions) >= 8:
+                break
+    return expressions[:8]
+
+
+def validate_pdf_reading(reading: dict[str, Any]) -> None:
+    spanish_sentences = reading["spanish_sentences"]
+    chinese_sentences = reading["chinese_sentences"]
+    if not spanish_sentences or len(spanish_sentences) != len(chinese_sentences):
+        raise ValueError("PDF 精读翻译句数与西语原文句数不一致。")
+    joined_translation = "\n".join(chinese_sentences)
+    forbidden = ("这段来自 PDF", "主题是“", "主要帮助你理解", "学习时不需要")
+    if any(item in joined_translation for item in forbidden):
+        raise ValueError("PDF 精读中文翻译不能使用总结说明代替逐句翻译。")
+    spanish = " ".join(spanish_sentences).lower()
+    missing = [term for term, _ in reading["expressions"] if not term_in_spanish_text(term, spanish)]
+    if missing:
+        raise ValueError(f"PDF 精读重点表达不在西语原文中：{', '.join(missing)}")
 
 
 def build_pdf_reading(topic: dict[str, Any], chunks: list[dict[str, Any]], source_pages: str, required: list[dict[str, str]], extended: list[dict[str, str]]) -> dict[str, Any]:
-    spanish = reading_excerpt(chunks, topic)
-    expressions = [entry["term"] for entry in required[:5]] + [row["term"] for row in extended[:3]]
-    return {
-        "source": f"PDF 参考页：{source_pages or '知识库综合主题'}；如原文过长，已节选为适合 20-30 分钟学习的一小段。",
-        "spanish": spanish,
-        "chinese": reading_translation(topic, source_pages),
-        "expressions": list(dict.fromkeys(expressions))[:8],
-        "summary": f"这段主要围绕“{topic['title']}”展开，适合用来积累词汇、理解句子结构，并做轻量仿写。",
+    spanish_sentences = reading_sentences_from_chunks(chunks)
+    chinese_sentences = translate_reading_sentences(spanish_sentences) if spanish_sentences else None
+    source_note = f"PDF 参考页：{source_pages or '知识库综合主题'}；已选取适合 B1 精读的小段。"
+
+    if not chinese_sentences:
+        spanish_sentences, chinese_sentences = fallback_reading_sentences(topic)
+        source_note = (
+            f"PDF 参考页：{source_pages or '知识库综合主题'}；原始片段含题目说明或无法稳定逐句翻译，"
+            "此处使用同主题 PDF 词汇和句型整理成 B1+ 精读短段。"
+        )
+
+    reading = {
+        "source": source_note,
+        "spanish_sentences": spanish_sentences,
+        "chinese_sentences": chinese_sentences,
+        "expressions": reading_expressions(spanish_sentences, required, extended),
+        "summary": f"这段主要围绕“{topic['title']}”展开，重点是理解原文信息并积累可复用表达。",
     }
+    validate_pdf_reading(reading)
+    return reading
 
 
 def format_pdf_reading(reading: dict[str, Any]) -> str:
-    expressions = "\n".join(f"- {item}" for item in reading["expressions"])
+    spanish = "\n".join(reading["spanish_sentences"])
+    chinese = "\n".join(reading["chinese_sentences"])
+    expressions = "\n".join(
+        f"{index}. {term} - {meaning}"
+        for index, (term, meaning) in enumerate(reading["expressions"], start=1)
+    )
     return f"""来源说明：{reading['source']}
 
 【西语原文】
-{reading['spanish']}
+{spanish}
 
 【中文翻译】
-{reading['chinese']}
+{chinese}
 
 【重点表达】
 {expressions}
@@ -834,8 +1066,8 @@ def format_pdf_reading(reading: dict[str, Any]) -> str:
 {reading['summary']}
 
 【理解问题】
-1. 这段话主要讨论了什么主题？
-2. 从重点表达中选 2 个，说说它们在文中的作用。"""
+1. 根据原文，这段话主要说明了什么？
+2. 原文提到的一个重要原因或做法是什么？"""
 
 
 B1_GRAMMAR_POINTS = [

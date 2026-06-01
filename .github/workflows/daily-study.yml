@@ -1,16 +1,15 @@
-name: Daily Spanish B1-B2 Study Email
+name: Daily Spanish Study Email
 
 on:
   workflow_dispatch:
   schedule:
-    # 00:17 UTC = 08:17 Beijing time. Avoid minute 0 because GitHub may delay or drop schedules at the start of an hour.
-    - cron: '17 0 * * *'
+    # 00:00 UTC = 08:00 Beijing time.
+    - cron: '0 0 * * *'
 
 jobs:
   send-daily-study-email:
     runs-on: ubuntu-latest
     env:
-      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
       DELE_COURSE_START_DATE: '2026-05-27'
       DELE_TIMEZONE: Asia/Shanghai
 
@@ -33,4 +32,6 @@ jobs:
         run: python3 scripts/generate_word.py
 
       - name: Send email
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: python3 scripts/send_email.py
