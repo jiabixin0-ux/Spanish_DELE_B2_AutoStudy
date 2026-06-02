@@ -20,6 +20,8 @@ from .config import (
     display_path,
     ensure_project_dirs,
 )
+from .ai_client import generate_ai_lesson
+from .prompt_builder import build_daily_lesson_prompt
 from .split_knowledge import extract_terms
 
 
@@ -1586,6 +1588,129 @@ def add_new_review_cards(cards: list[dict[str, Any]], today: date, topic: dict[s
     return cards
 
 
+AI_REQUIRED_SECTIONS = (
+    "## 1. 今日学习目标",
+    "## 2. PDF 精读：西语原文 + 准确中文翻译",
+    "## 3. 逐句重点讲解",
+    "## 4. 今日核心词汇：25-35 个",
+    "## 5. 高频词组：10-15 个",
+    "## 6. 实用句型：3-5 个",
+    "## 7. 今日语法小点：1 个",
+    "## 8. 轻量输出训练",
+    "## 9. 间隔复习",
+    "## 10. 今日小测试：5 题",
+    "## 11. 答案与解析",
+)
+
+
+def compact_vocab_candidate(term: str, topic: dict[str, Any], example_index: int = 0) -> dict[str, str]:
+    example, translation = natural_example(term, topic, example_index)
+    return {
+        "term": term,
+        "meaning": term_meaning(term),
+        "collocation": collocation_for(term),
+        "example": example,
+        "translation": translation,
+    }
+
+
+def build_ai_vocabulary_candidates(
+    topic: dict[str, Any],
+    chunks: list[dict[str, Any]],
+    required_phrases: list[dict[str, str]],
+    extended_vocab: list[dict[str, str]],
+    limit: int = 35,
+) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    seen: set[str] = set()
+
+    def add(row: dict[str, str]) -> None:
+        term = row["term"]
+        if term in seen or len(rows) >= limit:
+            return
+        seen.add(term)
+        rows.append(row)
+
+    for row in extended_vocab:
+        add(
+            {
+                "term": row["term"],
+                "meaning": row["meaning"],
+                "collocation": collocation_for(row["term"]),
+                "example": row["example"],
+                "translation": row["translation"],
+            }
+        )
+    for row in required_phrases:
+        add(compact_vocab_candidate(row["term"], topic, len(rows)))
+    for term in pdf_terms(chunks, limit=40) + COMMON_B1_VOCAB:
+        add(compact_vocab_candidate(term, topic, len(rows)))
+        if len(rows) >= limit:
+            break
+    return rows
+
+
+def build_ai_phrase_candidates(
+    topic: dict[str, Any],
+    chunks: list[dict[str, Any]],
+    required_phrases: list[dict[str, str]],
+    variant: int,
+    limit: int = 15,
+) -> list[dict[str, str]]:
+    by_term = {row["term"]: row for row in required_phrases}
+    rows: list[dict[str, str]] = []
+    seen: set[str] = set()
+
+    for term in phrase_candidates(topic, chunks, variant):
+        if term in seen:
+            continue
+        seen.add(term)
+        row = by_term.get(term)
+        if row:
+            rows.append(
+                {
+                    "term": row["term"],
+                    "meaning": row["meaning"],
+                    "collocation": row["collocation"],
+                    "example": row["example"],
+                    "translation": row["translation"],
+                }
+            )
+        else:
+            example, translation = natural_example(term, topic, len(rows))
+            rows.append(
+                {
+                    "term": term,
+                    "meaning": term_meaning(term),
+                    "collocation": collocation_for(term),
+                    "example": example,
+                    "translation": translation,
+                }
+            )
+        if len(rows) >= limit:
+            break
+    return rows
+
+
+def normalize_ai_markdown(markdown: str, day_number: int) -> str:
+    markdown = re.sub(r"(?m)^```(?:markdown|md)?\s*$", "", markdown.strip())
+    markdown = re.sub(r"(?m)^```\s*$", "", markdown).strip()
+    expected_title = f"# 西语 B1 巩固与 B2 过渡 - Día {day_number}"
+    if markdown.startswith(expected_title):
+        return markdown + "\n"
+    lines = markdown.splitlines()
+    if lines and lines[0].startswith("# "):
+        lines[0] = expected_title
+        return "\n".join(lines).strip() + "\n"
+    return f"{expected_title}\n\n{markdown}\n"
+
+
+def validate_ai_lesson_structure(markdown: str) -> None:
+    missing = [section for section in AI_REQUIRED_SECTIONS if section not in markdown]
+    if missing:
+        raise ValueError("AI 生成的每日课程结构不完整，缺少：" + "、".join(missing))
+
+
 def build_lesson(knowledge: dict[str, Any], day_number: int, today: date, cards_path: Path) -> dict[str, str]:
     _ = cards_path
     plan = knowledge["course_plan"]
@@ -1600,44 +1725,27 @@ def build_lesson(knowledge: dict[str, Any], day_number: int, today: date, cards_
         f"p.{chunk['page_start']}" if chunk["page_start"] == chunk["page_end"] else f"p.{chunk['page_start']}-{chunk['page_end']}"
         for chunk in chunks
     )
-    reading = build_pdf_reading(topic, chunks, source_pages, required_phrases, extended_vocab)
+    reading_text = "\n".join(reading_sentences_from_chunks(chunks))
+    vocabulary_candidates = build_ai_vocabulary_candidates(topic, chunks, required_phrases, extended_vocab)
+    phrase_items = build_ai_phrase_candidates(topic, chunks, required_phrases, variant)
     review_block = build_b1_spaced_review(plan, day_number, today)
+    prompt = build_daily_lesson_prompt(
+        day_number=day_number,
+        date_str=today.isoformat(),
+        reading_text=reading_text,
+        vocabulary_items=vocabulary_candidates,
+        phrase_items=phrase_items,
+        grammar_focus=grammar_point,
+        review_items=review_block,
+    )
 
-    markdown = f"""# 西语 B1 巩固与 B2 过渡 - Día {day_number}
-
-## 今日目标
-【具体目标】今天掌握 8 个与“{topic['title']}”相关的常用词组，并能用其中 5 个写出简单句子。
-
-【学习定位】以 PDF 的 B1 内容为主，先积累词汇和固定搭配，再做少量 B1+ 输出。
-
-【预计用时】20-30 分钟。输入约 70%，输出约 30%。
-
-【PDF 来源】{source_pages or '知识库综合复习'}
-
-## 今日必背词组：8 个
-{format_required_phrases(required_phrases)}
-
-## 今日扩展词汇：10-15 个
-{format_extended_vocab(extended_vocab)}
-
-## PDF 精读：1 段
-{format_pdf_reading(reading)}
-
-## 今日语法小点：1 个
-{format_b1_grammar(grammar_point)}
-
-## 轻量输出训练
-{build_light_output(required_phrases, grammar_point, topic)}
-
-## 间隔复习
-{review_block}
-
-## 今日小测试（5-6 题）
-{build_b1_quiz(required_phrases, extended_vocab, grammar_point)}
-
-## 答案与解析
-{build_b1_answers(required_phrases, extended_vocab, grammar_point)}
-"""
+    try:
+        markdown = normalize_ai_markdown(generate_ai_lesson(prompt), day_number)
+        validate_ai_lesson_structure(markdown)
+    except Exception as exc:
+        print(f"AI 生成每日课程失败：{exc}")
+        print(f"当天主题：{topic['title']}；PDF 来源：{source_pages or '未选到可读页'}")
+        raise
 
     html_body = markdown_to_html(markdown)
     return {"markdown": markdown, "html": html_body, "subject": f"西语 B1 巩固与 B2 过渡 Día {day_number} - {topic['title']}"}
