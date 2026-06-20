@@ -1,5 +1,0 @@
-sender_email: jiabixin0@gmail.com
-receiver_email: jiabixin0@gmail.com
-smtp_server: smtp.gmail.com
-smtp_port: 587
-output_path: output/daily_lesson.md
